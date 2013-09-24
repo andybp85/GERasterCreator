@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+  <title>Create Raster Dataset</title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type=
+  "text/javascript"></script>
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  <script type="text/javascript" src="createRaster.js"></script>
+  <style type="text/css">
+  /*<![CDATA[*/
+        body {
+                width: 1000px;
+        }
+        #map3d {
+                float:left;
+                height:600px;
+                margin-right:10px;
+                width:800px;
+                
+        }
+        #controls {
+                border:1px solid black;
+                float: left;
+                padding: 5px;
+                width: 150px;
+        }
+        #vers {
+        	position: absolute;
+        	top: 620px;
+        }
+        #output {
+        	left: 10px;
+				  position: absolute;
+					top: 650px;
+        }
+        #download {
+        	left: 580px;
+				  position: absolute;
+					top: 620px;
+        }
+  /*]]>*/
+  </style>
+</head>
+
+<body>
+  <div id="map3d"></div>
+
+  <div id="controls">
+  	<div name="options">
+      GE Options:<br />
+      <input type="checkbox" class="updateOptions" id="statusbar" checked/>Status Bar<br />
+      <input type="checkbox" class="updateOptions" id="nav" />Navigation Control<br />
+      <input type="checkbox" class="updateOptions" id="LL" />Lat/Long<br />
+      <input type="checkbox" class="updateOptions" id="overview" />Overview Map<br />
+      <input type="checkbox" class="updateOptions" id="scaleLegend" />Scale Legend
+    </div> 
+    
+    <br />
+    
+    <div id="parameters">
+    	First Box:
+    	<br />
+      LL Lat: <input type="text" id="startLLLat" value="-8.07" /><br />
+      LL Long: <input type="text" id="startLLLng" value="33.226" />
+      <br /><br />
+      LR Lat: <input type="text" id="startLRLat" value="-8.07" /><br />
+      LR Long: <input type="text" id="startLRLng" value="33.232" />
+      <br /><br />
+      UR Lat: <input type="text" id="startURLat" value="-8.065" /><br />
+      UR Long: <input type="text" id="startURLng" value="33.232" />
+      <br /><br />
+      UL Lat: <input type="text" id="startULLat" value="-8.065" /><br />
+      UL Long: <input type="text" id="startULLng" value="33.226" />
+      <br /><br />
+      Polygon Alt: <input type="text" id="startAlt" value="0"/>
+      
+      <br /><br />
+      # Lat Boxes: <input type="text" id="numLat" value="10" /><br />
+      # Long Boxes: <input type="text" id="numLng" value="10" />
+      
+      <br />
+      <input type="button" id="drawMap" value="Draw" />
+      <br /><br />
+      Note: All units in decimal.
+    </div>
+    
+  </div>
+  
+  <br />
+  
+  <div id="vers">
+    Installed Plugin Version: <span id="installed-plugin-version" style=
+    "font-weight: bold;">Loading...</span>
+  </div>
+  <input type="button" id="download" value="Download raster dataset" />
+  <br />
+  
+  <textarea rows="50" cols="100" id="output">
+    test
+  </textarea>
+</body>
+</html>
+
