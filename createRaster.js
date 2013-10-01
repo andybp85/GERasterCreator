@@ -12,7 +12,7 @@ var la = null;
 var currentProjectionFolder = null;
 
 var newCoords = null;
-var mousedown = false;
+var mbutton = false;
 
 //--GOOGLE-EARTH------------------------------
 
@@ -40,7 +40,7 @@ function failureCallback(errorCode) {
 	alert(errorCode);
 }
 
-//--DATASET-CREATOR----------------------------------
+//--UTILITY-FUNCTIONS----------------------------------
 
 // function converDec(val) {
 //     var x = String(val).split(['.']);
@@ -53,6 +53,32 @@ function failureCallback(errorCode) {
 //     out += '"';
 //     return out;
 // }
+
+// var Reflector = function(obj) {
+    
+//     this.getProperties = function() {
+//         var properties = [];
+//         for (var prop in obj) {
+//             if (typeof obj[prop] != 'function') {
+//                 properties.push(prop);
+//             }
+//         }
+//         return properties;
+//     }
+  
+//     this.getAllMethods = function() {
+//         var methods = [];
+//         for (var method in obj) {
+//             if (typeof obj[method] == 'function') {
+//                 methods.push(method);
+//             }
+//         }
+//         return methods;
+//     }
+    
+// }
+
+//--DATASET-CREATOR----------------------------------
 
 function createArray(length) {
     var arr = new Array(length || 0),
@@ -73,7 +99,9 @@ var dataset = {
     },
     
     createMap : function (nLat,nLng) {
+        
         this.dataMap = createArray(nLat,nLng);
+        
         for (var i = 0; i < nLat; i++) {
             for (var j = 0; j < nLng; j++) {
                 this.dataMap[i][j] = 0;    
@@ -81,13 +109,11 @@ var dataset = {
         }
     },
 
-    addLat : function(id,LRlatVal){ //,URlAtVal) {
+    addLat : function(id,LRlatVal){ 
         this.rasterMap.LRlatVals[id] = { 'v' : LRlatVal, 'd' : 0 };
-        //this.rasterMap.URlatVals[id] = { 'v' : URlAtVal, 'd' : 0 };
     },
-    addLng : function(id,LRlngVal){ //,URlngVal) {
+    addLng : function(id,LRlngVal){ 
         this.rasterMap.LRlngVals[id] = { 'v' : LRlngVal, 'd' : 0 };
-        //this.rasterMap.URlngVals[id] = { 'v' : URlngVal, 'd' : 0 };
     },
     
     render : function() {
@@ -112,13 +138,12 @@ var dataset = {
         while (lat < this.rasterMap.LRlatVals[latI].v) {
             latI++;
         }
-        
         var lngI = numLng - 1;
         while (lng > this.rasterMap.LRlngVals[lngI].v) {
             lngI--;
         }
         
-        dataset.dataMap[latI][lngI] = 1;
+       (dataset.dataMap[latI][lngI]) = val;
         
         this.render();
     }
@@ -145,13 +170,26 @@ function initGrid() {
 	
     dataset.createMap(numLat,numLng);
     
+//     google.earth.addEventListener(ge.getGlobe(), 'mousemove', function(e) {
+//         if (mbutton) {
+//             e.preventDefault();
+//         }
+//     });
+//     google.earth.addEventListener(ge.getGlobe(), 'mouseup', function(e) {
+//         mbutton = false;
+//         console.log('mouseup: ' + mbutton);
+//     });
+    
 	// add the grid
 	genPolygons();
 
 	for (x = 0; x < placemarks.length; x++) {
 		ge.getFeatures().appendChild(placemarks[x]);
 	}
-    //console.log(dataset.rasterMap);
+    
+    clickInit();
+    
+    //console.log(dataset);
 }
 
 function genPolygons() {
@@ -217,53 +255,136 @@ function makePolygon(latI, lngI, id) {
 
     if (!placemarks[id].getStyleSelector()) {
         placemarks[id].setStyleSelector(ge.createStyle(''));
-    }
+    }    
     placemarks[id].getStyleSelector().getLineStyle().setWidth(3);
     placemarks[id].getStyleSelector().getLineStyle().getColor().set('ffffffff');
     var polyColor = placemarks[id].getStyleSelector().getPolyStyle();
     polyColor.setFill(1);
 
-    google.earth.addEventListener(placemarks[id], 'mousedown', function(e) {
-        //mousedown = true;
-        var lcolor = placemarks[id].getStyleSelector().getLineStyle().getColor();
-        var pcolor = placemarks[id].getStyleSelector().getPolyStyle().getColor();
+//     google.earth.addEventListener(placemarks[id], 'click', function(e) {
         
-        if ( lcolor.get() == "ffffffff") {
-            dataset.boxChange(e.getLatitude(),e.getLongitude(),1);
-            lcolor.set('ff00008B');
-            pcolor.set('ff00008B');
-        } else {
-            dataset.boxChange(e.getLatitude(),e.getLongitude(),0);
-            lcolor.set('ffffffff');
-            pcolor.set('ffffffff');
-        }
-    });
-    
-    google.earth.addEventListener(placemarks[id], 'click', function(e) {
-//         if (mousedown) {
-//             e.preventDefault();
+//         var lcolor = placemarks[id].getStyleSelector().getLineStyle().getColor();
+//         var pcolor = placemarks[id].getStyleSelector().getPolyStyle().getColor();
+        
+//         if ( lcolor.get() == "ffffffff") {
+//             dataset.boxChange(e.getLatitude(),e.getLongitude(),1);
+//             lcolor.set('ff00008B');
+//             pcolor.set('ff00008B');
+//         } else {
+//             dataset.boxChange(e.getLatitude(),e.getLongitude(),0);
+//             lcolor.set('ffffffff');
+//             pcolor.set('ffffffff');
 //         }
-            e.preventDefault();
-            if (mousedown) {
-                mousedown = false;
-            } else {
-                mousedown = true;
-            }
-            console.log(mousedown);
-    });
+//     });
     
-    google.earth.addEventListener(placemarks[id], 'mouseover', function(e) {
+//     google.earth.addEventListener(placemarks[id], 'mouseover', function(e) {
+//         if (mbutton) {
+//             //e.preventDefault();
+//             console.log('click');
+//             $(placemarks[id]).trigger('mousedown');
+//         }
+//     });
+    
+//     google.earth.addEventListener(placemarks[id], 'mouseup', function(e) {
+//         mbutton = false;    
+//         console.log('mouseup: ' + mbutton);
+//     });
+    
+    
+}
+
+function clickInit() {
+    
+//     var clicking = $(window).on("mousedown", function(e){
+//         return true;
+//         e.preventDefault();
+//     });
+    
+//     $(target).on("mouseover", function(){
+//         while(clicking == true){
+//             doTheThing();
+//         }
+//     });`
+    
+    // listen for mousedown on the window (look specifically for placemarks)
+//     google.earth.addEventListener(ge.getWindow(), 'mousedown', function(event) {
+//         event.preventDefault();
+//         event.stopPropagation();
         
-        if (mousedown) {
-            e.preventDefault();
-            console.log('true');
-            $(placemarks[id]).trigger('mousedown');
+//         var placemark = event.getTarget();
+        
+//         if (placemark.getType() == 'KmlPlacemark' &&
+//             placemark.getGeometry().getType() == 'KmlPolygon') {
+            
+//             mbutton = true;
+//             console.log(mbutton);
+            
+            
+            
+//         } 
+//     });
+    
+//     google.earth.addEventListener(ge.getWindow(), 'mousedown', function(event) {
+//         var placemark = event.getTarget();
+//         if (placemark.getType() == 'KmlPlacemark' &&
+//             placemark.getGeometry().getType() == 'KmlPolygon') {
+//             event.preventDefault();
+//             mbutton = true;
+//             console.log(mbutton);
+//         }
+//     });
+    
+    google.earth.addEventListener(ge.getWindow(), 'click', function(event) {
+        var placemark = event.getTarget();
+        if (placemark.getType() == 'KmlPlacemark' &&
+            placemark.getGeometry().getType() == 'KmlPolygon') {
+            event.preventDefault();
+            (mbutton == false) ? mbutton = true : mbutton = false;
+            console.log(mbutton);
         }
     });
     
-    google.earth.addEventListener(placemarks[id], 'mouseup', function(e) {
-        mousedown = false;    
+//     for ( var i = 0; i < placemarks.length; i++ ) {
+    google.earth.addEventListener(ge.getWindow(), 'mouseover', function(event) {
+        var placemark = event.getTarget();
+        if (mbutton) {
+            event.preventDefault();
+            console.log('over: ' + event.getTarget().getId());
+            
+            //                 $(placemarks[i]).trigger('mousedown');
+            var lcolor = placemark.getStyleSelector().getLineStyle().getColor();
+            var pcolor = placemark.getStyleSelector().getPolyStyle().getColor();
+            
+            if ( lcolor.get() == "ffffffff") {
+                dataset.boxChange(event.getLatitude(),event.getLongitude(),1);
+                lcolor.set('ff00008B');
+                pcolor.set('ff00008B');
+            } else {
+                dataset.boxChange(event.getLatitude(),event.getLongitude(),0);
+                lcolor.set('ffffffff');
+                pcolor.set('ffffffff');
+            }
+        } else {console.log('not: ' + event.getTarget().getId())}
     });
+    //     }
+    
+
+    google.earth.addEventListener(ge.getGlobe(), 'mousemove', function(event) {
+        console.log(event.getLatitude());
+        if (mbutton) {
+            console.log(event.getTarget().getId() + ' : ' + event.getTarget().getType());
+            event.preventDefault();
+            event.stopPropagation();
+
+        }
+    });
+    
+//     google.earth.addEventListener(ge.getWindow(), 'mouseup', function(event) {
+//         if (mbutton) {
+//             mbutton = false;
+//             console.log(mbutton);
+//         }
+//     });
 }
 
 //--CONTROLS----------------------------------

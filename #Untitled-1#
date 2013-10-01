@@ -1,0 +1,42 @@
+var dragInfo = null;
+
+placemark.setName('Drag Me!');
+
+// listen for mousedown on the window (look specifically for point placemarks)
+google.earth.addEventListener(ge.getWindow(), 'mousedown', function(event) {
+  if (event.getTarget().getType() == 'KmlPlacemark' &&
+      event.getTarget().getGeometry().getType() == 'KmlPolygon') {
+    //event.preventDefault();
+    //var placemark = event.getTarget();
+    event.getTarget().triggger('click');
+    dragInfo = {
+      placemark: event.getTarget(),
+      dragged: false
+    };
+    
+    mbutton = true;
+  } 
+});
+
+// listen for mousemove on the globe
+google.earth.addEventListener(ge.getGlobe(), 'mousemove', function(event) {
+  if (dragInfo) {
+    event.preventDefault();
+    var point = dragInfo.placemark.getGeometry();
+    point.setLatitude(event.getLatitude());
+    point.setLongitude(event.getLongitude());
+    dragInfo.dragged = true;
+  }
+});
+
+// listen for mouseup on the window
+google.earth.addEventListener(ge.getWindow(), 'mouseup', function(event) {
+  if (dragInfo) {
+    if (dragInfo.dragged) {
+      // if the placemark was dragged, prevent balloons from popping up
+      event.preventDefault();
+    }
+    
+    dragInfo = null;
+  }
+});
