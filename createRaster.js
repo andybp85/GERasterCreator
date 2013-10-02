@@ -42,7 +42,7 @@ function failureCallback(errorCode) {
 
 //--UTILITY-FUNCTIONS----------------------------------
 
-// function converDec(val) {
+// function convDecToArc(val) {
 //     var x = String(val).split(['.']);
 //     var out = x[0];
 //     out += "\u00B0";
@@ -78,8 +78,6 @@ function failureCallback(errorCode) {
     
 // }
 
-//--DATASET-CREATOR----------------------------------
-
 function createArray(length) {
     var arr = new Array(length || 0),
         i = length;
@@ -88,9 +86,10 @@ function createArray(length) {
         var args = Array.prototype.slice.call(arguments, 1);
         while(i--) arr[length-1 - i] = createArray.apply(this, args);
     }
-
     return arr;
 }
+
+//--DATASET-CREATOR----------------------------------
 
 var dataset = {
     rasterMap : {
@@ -100,11 +99,11 @@ var dataset = {
     
     createMap : function (nLat,nLng) {
         
-        this.dataMap = createArray(nLat,nLng);
+        this.grid = createArray(nLat,nLng);
         
         for (var i = 0; i < nLat; i++) {
             for (var j = 0; j < nLng; j++) {
-                this.dataMap[i][j] = 0;    
+                this.grid[i][j] = 0;    
             }
         }
     },
@@ -124,7 +123,7 @@ var dataset = {
                  if (iLng != numLng-1) {
                      data += ',';
                  }
-                 data += iLat + ',' + iLng + ':' + this.dataMap[iLat][iLng] + ' ';
+                 data += iLat + ',' + iLng + ':' + this.grid[iLat][iLng] + ' ';
              }
              data += '\n';
          }        
@@ -132,7 +131,7 @@ var dataset = {
     },
     
     getBox : function (lat,lng) {
-        var latI = 1;
+        var latI = 0;
         while (lat < this.rasterMap.LRlatVals[latI].v) {
             latI++;
         }
@@ -142,37 +141,42 @@ var dataset = {
         }
         return {'latI' : latI,'lngI' : lngI};
     },
+    
     boxChange : function(lat,lng,val) {
        var d = this.getBox(lat,lng);
-       (dataset.dataMap[d.latI][d.lngI]) = val;
+       (dataset.grid[d.latI][d.lngI]) = val;
        this.render();
     },
     
-    boxColorChange : function(placemark,lat,lng){
+    boxColorChange : function(lat,lng){
     
-    if (mbutton) {
-        
-        var lcolor = placemark.getStyleSelector().getLineStyle().getColor();
-        var pcolor = placemark.getStyleSelector().getPolyStyle().getColor();
-        
-        if ( lcolor.get() == "ffffffff") {
-            this.boxChange(lat,lng,1);
-            lcolor.set('ff00008B');
-            pcolor.set('ff00008B');
-        } else {
-            this.boxChange(lat,lng,0);
-            lcolor.set('ffffffff');
-            pcolor.set('ffffffff');
-        }        
+        if (mbutton) {
+            
+            var LL = this.getBox(lat,lng);
+            
+            var pID = (LL.lngI * 10) + LL.latI;
+            
+            var lcolor = placemarks[pID].getStyleSelector().getLineStyle().getColor();
+            var pcolor = placemarks[pID].getStyleSelector().getPolyStyle().getColor();
+            
+            if ( lcolor.get() == "ffffffff") {
+                this.boxChange(lat,lng,1);
+                lcolor.set('ff00008B');
+                pcolor.set('ff00008B');
+            } else {
+                this.boxChange(lat,lng,0);
+                lcolor.set('ffffffff');
+                pcolor.set('ffffffff');
+            }        
+        }
     }
-}
 };
 
 //--GRID-FUNCS---------------------------------
 
 function RemoveAllFeatures() { //needs to take out just placemarks
     var features = ge.getFeatures();
-    while (features.getLastChild() != null) {
+    while (features.getLastChild() !== null) {
         features.removeChild(features.getLastChild());
     }
 }
@@ -205,16 +209,16 @@ function genPolygons() {
     for (var y = 0; y < numLng; y++) {
         makePolygon(0, y, count);
         dataset.addLng(y,newCoords.LR.lng);//,newCoords.UR.lng);
+        dataset.addLat(0,newCoords.LR.lat)
         count++;
         for (var x = 1; x < numLat; x++) {
             makePolygon(x, y, count);
-            if (y == 0) {
+            if (y === 0) {
                 dataset.addLat(x,newCoords.LR.lat);//,newCoords.UR.lat);
             }
             count++;
         }     
     }
-//     console.log(count);
     dataset.render();
 }
 
@@ -273,31 +277,30 @@ function makePolygon(latI, lngI, id) {
 
 function clickInit() {
     
+    var oldID = null;
+    
     google.earth.addEventListener(ge.getWindow(), 'mousedown', function(event) {
         var placemark = event.getTarget();
         if (placemark.getType() == 'KmlPlacemark' &&
             placemark.getGeometry().getType() == 'KmlPolygon') {
             event.preventDefault();
             mbutton = true;
-            console.log(mbutton);
-            dataset.boxColorChange(placemark,event.getLatitude(),event.getLongitude());
+//             console.log(mbutton);
+            dataset.boxColorChange(event.getLatitude(),event.getLongitude());
         }
     });
     
-//     for ( var i = 0; i < placemarks.length; i++ ) {
-//     google.earth.addEventListener(ge.getWindow(), 'mouseover', function(event) {
-//         event.preventDefault();
-//         var placemark = event.getTarget();
-//         dataset.boxColorChange(placemark);
-//     });
-//     }
-    
-
     google.earth.addEventListener(ge.getGlobe(), 'mousemove', function(event) {
-//         console.log(event.getLatitude());
         if (mbutton) {
-//             console.log(event.getTarget().getId() + ' : ' + event.getTarget().getType());
             event.preventDefault();
+            
+            var LL = dataset.getBox(event.getLatitude(),event.getLongitude());
+            if ( oldID != ( ( LL.lngI * 10) + LL.latI ) ) {
+                oldID = (LL.lngI * 10) + LL.latI;
+                dataset.boxColorChange( event.getLatitude(),event.getLongitude() );
+            }
+
+            
 
         }
     });
@@ -305,11 +308,9 @@ function clickInit() {
     google.earth.addEventListener(ge.getWindow(), 'mouseup', function(event) {
         if (mbutton) {
             mbutton = false;
-            console.log(mbutton);
         }
     });
 }
-
 //--CONTROLS----------------------------------
 
 $(document).ready(function() {
