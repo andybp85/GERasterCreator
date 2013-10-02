@@ -319,27 +319,29 @@ $(document).ready(function() {
 
 	$('#drawMap').click(function() {
         startCoords = {
-            LL: {
-                lat: Number($('#startLLLat').val()),
-                lng: Number($('#startLLLng').val()),
-                alt: Number($('#startAlt').val())
-            },
-            LR: {
-                lat: Number($('#startLRLat').val()),
-                lng: Number($('#startLRLng').val()),
-                alt: Number($('#startAlt').val())
-            },
-            UR: {
-                lat: Number($('#startURLat').val()),
-                lng: Number($('#startURLng').val()),
-                alt: Number($('#startAlt').val())
-            },
             UL: {
                 lat: Number($('#startULLat').val()),
                 lng: Number($('#startULLng').val()),
                 alt: Number($('#startAlt').val())
             },
+            LL: {
+                lat: Number($('#startULLat').val()) - Number($('#cellSize').val()),
+                lng: Number($('#startULLng').val()),
+                alt: Number($('#startAlt').val())
+            },
+            LR: {
+                lat: Number($('#startULLat').val()) - Number($('#cellSize').val()),
+                lng: Number($('#startULLng').val()) + Number($('#cellSize').val()),
+                alt: Number($('#startAlt').val())
+            },
+            UR: {
+                lat: Number($('#startULLat').val()),
+                lng: Number($('#startULLng').val()) + Number($('#cellSize').val()),
+                alt: Number($('#startAlt').val())
+            }
         };	
+        
+        console.log(startCoords);
         
         numLng = Number($('#numLng').val());
         numLat = Number($('#numLat').val());
