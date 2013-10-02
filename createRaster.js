@@ -5,6 +5,9 @@ var LINE_WIDTH = 0.04479550075655295;
 var startCoords = null;
 var numLng = null;
 var numLat = null;
+var cellSize = null;
+var noData = null;
+var LLCorner = {'X':0,'Y':0};
 
 var placemarks = [];
 var ge = null;
@@ -116,16 +119,21 @@ var dataset = {
     },
     
     render : function() {
-        var data = '';
-            
+        var data = 'NCOLS ' + numLng + "\n";
+        data += 'NROWS ' + numLat + "\n";
+        data += 'XLLCORNER ' + LLCorner.X + "\n";
+        data += 'YLLCORNER ' + LLCorner.Y + "\n";
+        data += 'CELLSIZE ' + cellSize +  "\n";
+        data += 'NODATA_VALUE ' + noData +  "\n\n";
+         
          for (var iLat  = 0; iLat < numLat; iLat++) {
              for (var iLng = numLng-1; iLng >= 0; iLng--) {
                  if (iLng != numLng-1) {
-                     data += ',';
+                     data += ' ';
                  }
-                 data += iLat + ',' + iLng + ':' + this.grid[iLat][iLng] + ' ';
+                 data += this.grid[iLat][iLng];
              }
-             data += '\n';
+             data += ' ';
          }        
         $('#output').text(data);
     },
@@ -193,29 +201,30 @@ function initGrid() {
 	
     dataset.createMap(numLat,numLng);
     
-	// add the grid
 	genPolygons();
 
 	for (x = 0; x < placemarks.length; x++) {
 		ge.getFeatures().appendChild(placemarks[x]);
 	}
-    clickInit();
     
-    //console.log(dataset);
+    clickInit();
 }
 
 function genPolygons() {
     var count = 0;
-    for (var y = 0; y < numLng; y++) {
-        makePolygon(0, y, count);
-        dataset.addLng(y,newCoords.LR.lng);//,newCoords.UR.lng);
+    for (var lngI = 0; lngI < numLng; lngI++) {
+        makePolygon(0, lngI, count);
+        dataset.addLng(lngI,newCoords.LR.lng);//,newCoords.UR.lng);
         dataset.addLat(0,newCoords.LR.lat)
+        LLCorner.X = newCoords.LL.lng;
+        LLCorner.Y = newCoords.LL.lat;
         count++;
-        for (var x = 1; x < numLat; x++) {
-            makePolygon(x, y, count);
-            if (y === 0) {
-                dataset.addLat(x,newCoords.LR.lat);//,newCoords.UR.lat);
+        for (var latI = 1; latI < numLat; latI++) {
+            makePolygon(latI, lngI, count);
+            if (lngI === 0) {
+                dataset.addLat(latI,newCoords.LR.lat);//,newCoords.UR.lat);
             }
+            
             count++;
         }     
     }
@@ -318,6 +327,8 @@ $(document).ready(function() {
     google.setOnLoadCallback(init);
 
 	$('#drawMap').click(function() {
+        cellSize = Number($('#cellSize').val());
+        
         startCoords = {
             UL: {
                 lat: Number($('#startULLat').val()),
@@ -325,26 +336,25 @@ $(document).ready(function() {
                 alt: Number($('#startAlt').val())
             },
             LL: {
-                lat: Number($('#startULLat').val()) - Number($('#cellSize').val()),
+                lat: Number($('#startULLat').val()) - cellSize,
                 lng: Number($('#startULLng').val()),
                 alt: Number($('#startAlt').val())
             },
             LR: {
-                lat: Number($('#startULLat').val()) - Number($('#cellSize').val()),
-                lng: Number($('#startULLng').val()) + Number($('#cellSize').val()),
+                lat: Number($('#startULLat').val()) - cellSize,
+                lng: Number($('#startULLng').val()) + cellSize,
                 alt: Number($('#startAlt').val())
             },
             UR: {
                 lat: Number($('#startULLat').val()),
-                lng: Number($('#startULLng').val()) + Number($('#cellSize').val()),
+                lng: Number($('#startULLng').val()) + cellSize,
                 alt: Number($('#startAlt').val())
             }
         };	
         
-        console.log(startCoords);
-        
         numLng = Number($('#numLng').val());
         numLat = Number($('#numLat').val());
+        noData = Number($('#nodata').val());
         
         initGrid();
 		
