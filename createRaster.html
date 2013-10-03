@@ -10,36 +10,40 @@
   <script type="text/javascript" src="createRaster.js"></script>
   <style type="text/css">
   /*<![CDATA[*/
-        body {
-                width: 1000px;
-        }
-        #map3d {
-                float:left;
-                height:600px;
-                margin-right:10px;
-                width:800px;
-                
-        }
-        #controls {
-                border:1px solid black;
-                float: left;
-                padding: 5px;
-                width: 150px;
-        }
-        #vers {
-        	position: absolute;
-        	top: 620px;
-        }
-        #output {
-        	left: 10px;
-				  position: absolute;
-					top: 650px;
-        }
-        #download {
-        	left: 580px;
-				  position: absolute;
-					top: 620px;
-        }
+      body {
+          width: 1000px;
+      }
+      #map3d {
+          float:left;
+          height:600px;
+          margin-right:10px;
+          width:800px;
+          
+      }
+      #controls {
+          border:1px solid black;
+          float: left;
+          padding: 5px;
+          width: 150px;
+      }
+      #vers {
+          position: absolute;
+          top: 620px;
+      }
+      #output {
+          left: 10px;
+          position: absolute;
+          top: 650px;
+      }
+      #download {
+          left: 580px;
+          position: absolute;
+          top: 620px;
+      }
+      .position{
+          height: 13px;
+          width: 117px;
+      }
   /*]]>*/
   </style>
 </head>
@@ -56,6 +60,14 @@
       <input type="checkbox" class="updateOptions" id="overview" />Overview Map<br />
       <input type="checkbox" class="updateOptions" id="scaleLegend" />Scale Legend
     </div> 
+    
+    <br />
+    
+     <div id="position"/>
+     Position: <br />
+     Lat: <div id="latPos" class="position">0</div>
+     Lng: <div id="lngPos" class="position">0</div>
+     </div>
     
     <br />
     

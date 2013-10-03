@@ -300,6 +300,8 @@ function clickInit() {
     });
     
     google.earth.addEventListener(ge.getGlobe(), 'mousemove', function(event) {
+        $('#latPos').html(event.getLatitude());
+        $('#lngPos').html(event.getLongitude());
         if (mbutton) {
             event.preventDefault();
             
