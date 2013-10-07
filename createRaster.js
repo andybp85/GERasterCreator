@@ -9,7 +9,6 @@ var cellSize = null;
 var noData = null;
 var LLCorner = {'X':0,'Y':0};
 
-var placemarks = [];
 var ge = null;
 var la = null;
 var currentProjectionFolder = null;
@@ -99,14 +98,20 @@ var dataset = {
         LRlngVals : {},
         LRlatVals : {}
     },
-    
+    oldID : null,
+	
     createMap : function (nLat,nLng) {
         
         this.grid = createArray(nLat,nLng);
+		this.placemarks = createArray(nLat,nLng);
         
+        var id = 0;
         for (var i = 0; i < nLat; i++) {
             for (var j = 0; j < nLng; j++) {
-                this.grid[i][j] = 0;    
+				//console.log((i * 10) + j)
+                this.grid[i][j] = 0;
+				this.placemarks[j][i] = ge.createPlacemark( (id).toString() );
+				id++;
             }
         }
     },
@@ -143,39 +148,54 @@ var dataset = {
         while (lat < this.rasterMap.LRlatVals[latI].v) {
             latI++;
         }
+		
         var lngI = numLng - 1;
         while (lng > this.rasterMap.LRlngVals[lngI].v) {
             lngI--;
         }
+		
         return {'latI' : latI,'lngI' : lngI};
     },
     
     boxChange : function(lat,lng,val) {
-       var d = this.getBox(lat,lng);
-       (dataset.grid[d.latI][d.lngI]) = val;
-       this.render();
+	   
+        var d = this.getBox(lat,lng);
+//        console.log(d);
+        this.grid[d.latI][d.lngI] = val;
+	   
+        this.render();
     },
     
-    boxColorChange : function(lat,lng){
-    
+    boxColorChange : function(event){
         if (mbutton) {
-            
-            var LL = this.getBox(lat,lng);
-            
-            var pID = (LL.lngI * 10) + LL.latI;
-            
-            var lcolor = placemarks[pID].getStyleSelector().getLineStyle().getColor();
-            var pcolor = placemarks[pID].getStyleSelector().getPolyStyle().getColor();
-            
-            if ( lcolor.get() == "ffffffff") {
-                this.boxChange(lat,lng,1);
-                lcolor.set('ff00008B');
-                pcolor.set('ff00008B');
-            } else {
-                this.boxChange(lat,lng,0);
-                lcolor.set('ffffffff');
-                pcolor.set('ffffffff');
-            }        
+            var placemark = event.getTarget();
+            if (placemark.getType() == 'KmlPlacemark' &&
+                placemark.getGeometry().getType() == 'KmlPolygon') {
+                event.preventDefault();
+                
+//                 console.log(event.getLatitude() + ' ' + event.getLongitude())
+                var LL = dataset.getBox(event.getLatitude(),event.getLongitude());
+                if ( this.oldID != ( ( LL.lngI * 10) + LL.latI ) ) {
+                    this.oldID = (LL.lngI * 10) + LL.latI;
+                }
+                
+                
+//                 console.log(LL);
+//                 console.log(this.oldID);
+// 				console.log(this.placemarks[LL.latI][LL.lngI].getId());
+				
+                if ( this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().get() == "ffffffff") {
+                    this.boxChange(event.getLatitude(),event.getLongitude(),1);
+                    this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ff00008B');
+                    this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ff00008B');
+                } else {
+                    this.boxChange(event.getLatitude(),event.getLongitude(),0);
+                    this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ffffffff');
+                    this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ffffffff');
+                }        
+                
+                
+            }
         }
     }
 };
@@ -203,39 +223,45 @@ function initGrid() {
     
 	genPolygons();
 
-	for (x = 0; x < placemarks.length; x++) {
-		ge.getFeatures().appendChild(placemarks[x]);
+// 	for (x = 0; x < dataset.placemarks.length; x++) {
+// 		ge.getFeatures().appendChild(dataset.placemarks[x]);
+// 	}
+	for (x = 0; x < dataset.placemarks.length; x++) {
+		for (y = 0; y < dataset.placemarks[x].length; y++) {
+			ge.getFeatures().appendChild(dataset.placemarks[y][x]);
+		}
 	}
+    
     
     clickInit();
 }
 
 function genPolygons() {
-    var count = 0;
+    //var count = 0;
     for (var lngI = 0; lngI < numLng; lngI++) {
-        makePolygon(0, lngI, count);
+        makePolygon(0, lngI);//, count);
         dataset.addLng(lngI,newCoords.LR.lng);//,newCoords.UR.lng);
         dataset.addLat(0,newCoords.LR.lat)
         LLCorner.X = newCoords.LL.lng;
         LLCorner.Y = newCoords.LL.lat;
-        count++;
+        //count++;
         for (var latI = 1; latI < numLat; latI++) {
-            makePolygon(latI, lngI, count);
+            makePolygon(latI, lngI);//, count);
             if (lngI === 0) {
                 dataset.addLat(latI,newCoords.LR.lat);//,newCoords.UR.lat);
             }
             
-            count++;
+            //count++;
         }     
     }
     dataset.render();
 }
 
-function makePolygon(latI, lngI, id) {
+function makePolygon(latI, lngI) {//, id) {
     
-    placemarks[id] = ge.createPlacemark(id.toString());
+    //dataset.placemarks[id] = ge.createPlacemark(id.toString());
     var polygon = ge.createPolygon('');
-    placemarks[id].setGeometry(polygon);
+    dataset.placemarks[latI][lngI].setGeometry(polygon);
     
     var lngDiff = startCoords.LL.lng - startCoords.LR.lng;
     var latDiff = startCoords.LR.lat - startCoords.UR.lat;
@@ -275,45 +301,29 @@ function makePolygon(latI, lngI, id) {
     inner.getCoordinates().pushLatLngAlt(newCoords.UL.lat - innerDiff, newCoords.UL.lng + innerDiff, startCoords.UL.alt); //UL
     polygon.getInnerBoundaries().appendChild(inner);
 
-    if (!placemarks[id].getStyleSelector()) {
-        placemarks[id].setStyleSelector(ge.createStyle(''));
+    if (!dataset.placemarks[latI][lngI].getStyleSelector()) {
+        dataset.placemarks[latI][lngI].setStyleSelector(ge.createStyle(''));
     }    
-    placemarks[id].getStyleSelector().getLineStyle().setWidth(3);
-    placemarks[id].getStyleSelector().getLineStyle().getColor().set('ffffffff');
-    var polyColor = placemarks[id].getStyleSelector().getPolyStyle();
+    dataset.placemarks[latI][lngI].getStyleSelector().getLineStyle().setWidth(3);
+    dataset.placemarks[latI][lngI].getStyleSelector().getLineStyle().getColor().set('ffffffff');
+    var polyColor = dataset.placemarks[latI][lngI].getStyleSelector().getPolyStyle();
     polyColor.setFill(1);
 }
 
 function clickInit() {
     
-    var oldID = null;
-    
     google.earth.addEventListener(ge.getWindow(), 'mousedown', function(event) {
-        var placemark = event.getTarget();
-        if (placemark.getType() == 'KmlPlacemark' &&
-            placemark.getGeometry().getType() == 'KmlPolygon') {
-            event.preventDefault();
-            mbutton = true;
-//             console.log(mbutton);
-            dataset.boxColorChange(event.getLatitude(),event.getLongitude());
-        }
+        mbutton = true;
+        dataset.boxColorChange(event);
+        
     });
     
     google.earth.addEventListener(ge.getGlobe(), 'mousemove', function(event) {
         $('#latPos').html(event.getLatitude());
         $('#lngPos').html(event.getLongitude());
-        if (mbutton) {
-            event.preventDefault();
-            
-            var LL = dataset.getBox(event.getLatitude(),event.getLongitude());
-            if ( oldID != ( ( LL.lngI * 10) + LL.latI ) ) {
-                oldID = (LL.lngI * 10) + LL.latI;
-                dataset.boxColorChange( event.getLatitude(),event.getLongitude() );
-            }
-
-            
-
-        }
+        
+        dataset.boxColorChange(event);
+        
     });
     
     google.earth.addEventListener(ge.getWindow(), 'mouseup', function(event) {
