@@ -154,35 +154,30 @@ var dataset = {
         return {'latI' : latI,'lngI' : lngI};
     },
 
-    boxColorChange : function(event){
+    boxColorChange : function(lat,lng){
         if (mbutton) {
-            var placemark = event.getTarget();
-			if (placemark.getType() == 'KmlPlacemark' &&
-				placemark.getGeometry().getType() == 'KmlPolygon') {
-				event.preventDefault();
-			   
-				var LL = dataset.getBox(event.getLatitude(),event.getLongitude());
-				
-				if ( this.oldID != ( ( LL.lngI * 10) + LL.latI ) ) {
-					if (noData.checked) {
-						this.grid[LL.latI][LL.lngI] = noData.val;
-						this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ffae33ff');
-						this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ffae33ff');
-					} else if ( this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().get() == "ffffffff" || this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().get() ==  'ffae33ff') {
-						this.grid[LL.latI][LL.lngI] = 1;
-						this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ff00008B');
-						this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ff00008B');
-					} else {
-						this.grid[LL.latI][LL.lngI] = 0;
-						this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ffffffff');
-						this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ffffffff');
-					}        
-				
-				this.render();
-				
-                    this.oldID = (LL.lngI * 10) + LL.latI;
-                }
-            }
+			
+			var LL = dataset.getBox(lat,lng);
+							
+			if ( this.oldID != ( ( LL.lngI * 10) + LL.latI ) ) {
+				if (noData.checked) {
+					this.grid[LL.latI][LL.lngI] = noData.val;
+					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ffae33ff');
+					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ffae33ff');
+				} else if ( this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().get() == "ffffffff" || this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().get() ==  'ffae33ff') {
+					this.grid[LL.latI][LL.lngI] = 1;
+					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ff00008B');
+					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ff00008B');
+				} else {
+					this.grid[LL.latI][LL.lngI] = 0;
+					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ffffffff');
+					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ffffffff');
+				}        
+			
+			this.render();
+			
+				this.oldID = (LL.lngI * 10) + LL.latI;
+			}
         }
     }
 };
@@ -199,17 +194,20 @@ function RemoveAllFeatures() { //needs to take out just placemarks
 function clickInit() {
     
     google.earth.addEventListener(ge.getWindow(), 'mousedown', function(event) {
-        mbutton = true;
-        dataset.boxColorChange(event);
-        
+		if (event.getTarget().getType() == 'KmlPlacemark' && event.getTarget().getGeometry().getType() == 'KmlPolygon') {
+			mbutton = true;
+			event.preventDefault();
+        	dataset.boxColorChange(event.getLatitude(),event.getLongitude());
+		}
     });
     
     google.earth.addEventListener(ge.getGlobe(), 'mousemove', function(event) {
         $('#latPos').html(event.getLatitude());
         $('#lngPos').html(event.getLongitude());
-        
-        dataset.boxColorChange(event);
-        
+		if (mbutton && event.getTarget ().getType() == 'KmlPlacemark' && event.getTarget().getGeometry().getType() == 'KmlPolygon') {
+			event.preventDefault();
+			dataset.boxColorChange(event.getLatitude(),event.getLongitude());
+		}
     });
     
     google.earth.addEventListener(ge.getWindow(), 'mouseup', function(event) {
@@ -217,6 +215,13 @@ function clickInit() {
             mbutton = false;
         }
     });
+	
+	google.earth.addEventListener(ge.getView(), 'viewchange', function(){
+		if (mbutton) {
+			console.log(ge.getGlobe());
+			$(ge.getGlobe()).trigger('mousedown');
+		}
+	});
 }
 
 function initGrid() {
