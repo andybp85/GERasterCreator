@@ -168,7 +168,7 @@ var dataset = {
 						this.grid[LL.latI][LL.lngI] = noData.val;
 						this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ffae33ff');
 						this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ffae33ff');
-					} else if ( this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().get() == "ffffffff") {
+					} else if ( this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().get() == "ffffffff" || this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().get() ==  'ffae33ff') {
 						this.grid[LL.latI][LL.lngI] = 1;
 						this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ff00008B');
 						this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ff00008B');
