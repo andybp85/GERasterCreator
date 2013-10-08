@@ -40,9 +40,6 @@
           position: absolute;
           top: 620px;
       }
-      #nodata{
-        width:40px;
-      }
       .position{
           height: 13px;
           width: 117px;
@@ -79,14 +76,9 @@
     	<br />
       UL Lat: <input type="text" id="startULLat" value="-8.07" /><br />
       UL Long: <input type="text" id="startULLng" value="33.226" />
-      
       <br /><br />
-      Cell Size: <input type="text" id="cellSize" value="0.01" />
-      
-      <br /><br />
-      Nodata Val: <input type="text" id="nodata" value="-999" /> <br />
-      on/off: <input type="checkbox" class="updateOptions" id="nodata-box" />
-      
+      Cell Size: <input type="text" id="cellSize" value="0.01" /><br />
+      Nodata Val: <input type="text" id="nodata" value="-999" />
       <br /><br />
       Polygon Alt: <input type="text" id="startAlt" value="0"/>
       
@@ -108,7 +100,7 @@
     Installed Plugin Version: <span id="installed-plugin-version" style=
     "font-weight: bold;">Loading...</span>
   </div>
-<!--   <input type="button" id="download" value="Download raster dataset" /> -->
+  <input type="button" id="download" value="Download raster dataset" />
   <br />
   
   <textarea rows="50" cols="100" id="output"></textarea>
