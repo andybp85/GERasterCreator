@@ -162,6 +162,7 @@ var dataset = {
 				event.preventDefault();
 			   
 				var LL = dataset.getBox(event.getLatitude(),event.getLongitude());
+				
 				if ( this.oldID != ( ( LL.lngI * 10) + LL.latI ) ) {
 					if (noData.checked) {
 						this.grid[LL.latI][LL.lngI] = noData.val;
