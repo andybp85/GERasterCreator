@@ -308,8 +308,7 @@ function makePolygon(latI, lngI) {
 	
     dataset.placemarks[latI][lngI].getStyleSelector().getLineStyle().setWidth(3);
     dataset.placemarks[latI][lngI].getStyleSelector().getLineStyle().getColor().set('ffffffff');
-    var polyColor = dataset.placemarks[latI][lngI].getStyleSelector().getPolyStyle();
-    polyColor.setFill(1);
+    dataset.placemarks[latI][lngI].getStyleSelector().getPolyStyle().setFill(1);
 }
 
 //--CONTROLS----------------------------------
