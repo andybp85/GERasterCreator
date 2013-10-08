@@ -127,7 +127,7 @@ var dataset = {
         data += 'XLLCORNER ' + LLCorner.X + "\n";
         data += 'YLLCORNER ' + LLCorner.Y + "\n";
         data += 'CELLSIZE ' + cellSize +  "\n";
-        data += 'NODATA_VALUE ' + noData +  "\n\n";
+        data += 'NODATA_VALUE ' + noData.val +  "\n\n";
          
          for (var iLat  = 0; iLat < numLat; iLat++) {
              for (var iLng = numLng-1; iLng >= 0; iLng--) {
@@ -232,10 +232,6 @@ function initGrid() {
 	
 	genPolygons();
 	
-
-// 	for (x = 0; x < placemarks.length; x++) {
-// 		ge.getFeatures().appendChild(placemarks[x]);
-// 	}
 	for (x = 0; x < dataset.placemarks.length; x++) {
 		for (y = 0; y < dataset.placemarks[x].length; y++) {
 			ge.getFeatures().appendChild(dataset.placemarks[y][x]);
@@ -246,29 +242,24 @@ function initGrid() {
 }
 
 function genPolygons() {
-    //var count = 0;
     for (var lngI = 0; lngI < numLng; lngI++) {
-        makePolygon(0, lngI);//, count);
-        dataset.addLng(lngI,newCoords.LR.lng);//,newCoords.UR.lng);
+        makePolygon(0, lngI);
+        dataset.addLng(lngI,newCoords.LR.lng);
         dataset.addLat(0,newCoords.LR.lat)
         LLCorner.X = newCoords.LL.lng;
         LLCorner.Y = newCoords.LL.lat;
-        //count++;
         for (var latI = 1; latI < numLat; latI++) {
-            makePolygon(latI, lngI);//, count);
+            makePolygon(latI, lngI);
             if (lngI === 0) {
-                dataset.addLat(latI,newCoords.LR.lat);//,newCoords.UR.lat);
+                dataset.addLat(latI,newCoords.LR.lat);
             }
-            
-            //count++;
         }     
     }
     dataset.render();
 }
 
-function makePolygon(latI, lngI) {//, id) {
+function makePolygon(latI, lngI) {
     
-    //placemarks[id] = ge.createPlacemark(id.toString());
     var polygon = ge.createPolygon('');
     dataset.placemarks[latI][lngI].setGeometry(polygon);
     
@@ -297,17 +288,17 @@ function makePolygon(latI, lngI) {//, id) {
     var innerDiff = (startCoords.LR.lng - startCoords.LL.lng) * LINE_WIDTH;
 
     var outer = ge.createLinearRing('');
-    outer.getCoordinates().pushLatLngAlt(newCoords.LL.lat, newCoords.LL.lng, startCoords.LL.alt); //LL
-    outer.getCoordinates().pushLatLngAlt(newCoords.LR.lat, newCoords.LR.lng, startCoords.LR.alt); //LR
-    outer.getCoordinates().pushLatLngAlt(newCoords.UR.lat, newCoords.UR.lng, startCoords.UR.alt); //UR
-    outer.getCoordinates().pushLatLngAlt(newCoords.UL.lat, newCoords.UL.lng, startCoords.UL.alt); //UL
+    outer.getCoordinates().pushLatLngAlt(newCoords.LL.lat, newCoords.LL.lng, startCoords.LL.alt);
+    outer.getCoordinates().pushLatLngAlt(newCoords.LR.lat, newCoords.LR.lng, startCoords.LR.alt);
+    outer.getCoordinates().pushLatLngAlt(newCoords.UR.lat, newCoords.UR.lng, startCoords.UR.alt);
+    outer.getCoordinates().pushLatLngAlt(newCoords.UL.lat, newCoords.UL.lng, startCoords.UL.alt);
     polygon.setOuterBoundary(outer);
 
     var inner = ge.createLinearRing('');
-    inner.getCoordinates().pushLatLngAlt(newCoords.LL.lat + innerDiff, newCoords.LL.lng + innerDiff, startCoords.LL.alt); //LL
-    inner.getCoordinates().pushLatLngAlt(newCoords.LR.lat + innerDiff, newCoords.LR.lng - innerDiff, startCoords.LR.alt); //LR
-    inner.getCoordinates().pushLatLngAlt(newCoords.UR.lat - innerDiff, newCoords.UR.lng - innerDiff, startCoords.UR.alt); //UR
-    inner.getCoordinates().pushLatLngAlt(newCoords.UL.lat - innerDiff, newCoords.UL.lng + innerDiff, startCoords.UL.alt); //UL
+    inner.getCoordinates().pushLatLngAlt(newCoords.LL.lat + innerDiff, newCoords.LL.lng + innerDiff, startCoords.LL.alt);
+    inner.getCoordinates().pushLatLngAlt(newCoords.LR.lat + innerDiff, newCoords.LR.lng - innerDiff, startCoords.LR.alt);
+    inner.getCoordinates().pushLatLngAlt(newCoords.UR.lat - innerDiff, newCoords.UR.lng - innerDiff, startCoords.UR.alt);
+    inner.getCoordinates().pushLatLngAlt(newCoords.UL.lat - innerDiff, newCoords.UL.lng + innerDiff, startCoords.UL.alt);
     polygon.getInnerBoundaries().appendChild(inner);
 
     if (!dataset.placemarks[latI][lngI].getStyleSelector()) {
