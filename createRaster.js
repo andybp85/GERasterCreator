@@ -252,10 +252,11 @@ function genPolygons() {
         makePolygon(0, lngI);
         dataset.addLng(lngI,newCoords.LR.lng);
         dataset.addLat(0,newCoords.LR.lat)
-        LLCorner.X = newCoords.LL.lng;
-        LLCorner.Y = newCoords.LL.lat;
+        
         for (var latI = 1; latI < numLat; latI++) {
             makePolygon(latI, lngI);
+			LLCorner.X = newCoords.LL.lng;
+        	LLCorner.Y = newCoords.LL.lat;
             if (lngI === 0) {
                 dataset.addLat(latI,newCoords.LR.lat);
             }
@@ -269,25 +270,27 @@ function makePolygon(latI, lngI) {
     var polygon = ge.createPolygon('');
     dataset.placemarks[latI][lngI].setGeometry(polygon);
     
-    var lngDiff = startCoords.LL.lng - startCoords.LR.lng;
-    var latDiff = startCoords.LR.lat - startCoords.UR.lat;
+//     var lngDiff = startCoords.LL.lng - startCoords.LR.lng;
+//     var latDiff = startCoords.LR.lat - startCoords.UR.lat;
+	
+	console.log
 
     newCoords = {
         LL: {
-            lat: startCoords.LL.lat + (latI * latDiff),
-            lng: startCoords.LL.lng + (lngI * lngDiff)
+            lat: startCoords.LL.lat + (latI * -cellSize),
+            lng: startCoords.LL.lng + (lngI * -cellSize)
         },
         LR: {
-            lat: startCoords.LR.lat + (latI * latDiff),
-            lng: startCoords.LR.lng + (lngI * lngDiff)
+            lat: startCoords.LR.lat + (latI * -cellSize),
+            lng: startCoords.LR.lng + (lngI * -cellSize)
         },
         UR: {
-            lat: startCoords.UR.lat + (latI * latDiff),
-            lng: startCoords.UR.lng + (lngI * lngDiff)
+            lat: startCoords.UR.lat + (latI * -cellSize),
+            lng: startCoords.UR.lng + (lngI * -cellSize)
         },
         UL: {
-            lat: startCoords.UL.lat + (latI * latDiff),
-            lng: startCoords.UL.lng + (lngI * lngDiff)
+            lat: startCoords.UL.lat + (latI * -cellSize),
+            lng: startCoords.UL.lng + (lngI * -cellSize)
         },
     };
     
