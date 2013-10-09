@@ -103,7 +103,6 @@ var dataset = {
         
         this.grid = createArray(numLat,numLng);
 		this.placemarks = createArray(numLat,numLng);
-        console.log(this.placemarks);
         var id = 0;
         for (var i = 0; i < numLat; i++) {
             for (var j = 0; j < numLng; j++) {
@@ -273,8 +272,6 @@ function makePolygon(latI, lngI) {
 //     var lngDiff = startCoords.LL.lng - startCoords.LR.lng;
 //     var latDiff = startCoords.LR.lat - startCoords.UR.lat;
 	
-	console.log
-
     newCoords = {
         LL: {
             lat: startCoords.LL.lat + (latI * -cellSize),
