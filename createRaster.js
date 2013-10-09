@@ -99,16 +99,16 @@ var dataset = {
     },
     oldID : null,
 	
-    createMap : function (nLat,nLng) {
+    createMap : function () {
         
-        this.grid = createArray(nLat,nLng);
+        this.grid = createArray(numLat,numLng);
 		this.placemarks = createArray(numLat,numLng);
-        
+        console.log(this.placemarks);
         var id = 0;
-        for (var i = 0; i < nLat; i++) {
-            for (var j = 0; j < nLng; j++) {
+        for (var i = 0; i < numLat; i++) {
+            for (var j = 0; j < numLng; j++) {
                 this.grid[i][j] = 0;
-				this.placemarks[j][i] = ge.createPlacemark( (id).toString() );
+				this.placemarks[i][j] = ge.createPlacemark( (id).toString() );
 				id++;
             }
         }
@@ -234,13 +234,13 @@ function initGrid() {
 	la.setRange(5000);
 	ge.getView().setAbstractView(la);
 	
-    dataset.createMap(numLat,numLng);
+    dataset.createMap();
 	
 	genPolygons();
 	
 	for (x = 0; x < dataset.placemarks.length; x++) {
 		for (y = 0; y < dataset.placemarks[x].length; y++) {
-			ge.getFeatures().appendChild(dataset.placemarks[y][x]);
+			ge.getFeatures().appendChild(dataset.placemarks[x][y]);
 		}
 	}
     
