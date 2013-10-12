@@ -16,6 +16,8 @@ var currentProjectionFolder = null;
 var newCoords = null;
 var mbutton = false;
 
+var startViewChange = { 'camLatStart' : 0, 'camLngStart' : 0, 'pointLatStart' : 0, 'pointLngStart' : 0  };
+
 //--GOOGLE-EARTH------------------------------
 
 google.load("earth", "1");
@@ -163,17 +165,17 @@ var dataset = {
 					this.grid[LL.latI][LL.lngI] = noData.val;
 					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ffae33ff');
 					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ffae33ff');
-				} else if ( this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().get() == "ffffffff" || this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().get() ==  'ffae33ff') {
+				} else if ( this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().get() == "ff00008b" || this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().get() ==  'ffae33ff') {
 					this.grid[LL.latI][LL.lngI] = 1;
-					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ff00008B');
-					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ff00008B');
-				} else {
-					this.grid[LL.latI][LL.lngI] = 0;
 					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ffffffff');
 					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ffffffff');
+				} else {
+					this.grid[LL.latI][LL.lngI] = 0;
+					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ff00008b');
+					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ff00008b');
 				}        
 			
-			this.render();
+				this.render();
 			
 				this.oldID = (LL.lngI * 10) + LL.latI;
 			}
@@ -212,13 +214,24 @@ function clickInit() {
     google.earth.addEventListener(ge.getWindow(), 'mouseup', function(event) {
         if (mbutton) {
             mbutton = false;
+			dataset.oldID = null;
         }
     });
 	
+	google.earth.addEventListener(ge.getView(), 'viewchangebegin', function(){
+		if (mbutton) {
+			startViewChange.camLatStart = ge.getView().copyAsLookAt(ge.ALTITUDE_ABSOLUTE).getLatitude();
+			startViewChange.camLngStart = ge.getView().copyAsLookAt(ge.ALTITUDE_ABSOLUTE).getLongitude();
+			startViewChange.pointLatStart = Number($('#latPos').text());
+			startViewChange.pointLngStart = Number($('#lngPos').text());
+		}
+	});
+	
 	google.earth.addEventListener(ge.getView(), 'viewchange', function(){
 		if (mbutton) {
-			console.log(ge.getGlobe());
-			$(ge.getGlobe()).trigger('mousedown');
+ 			newLat = startViewChange.pointLatStart - (startViewChange.camLatStart - ge.getView().copyAsLookAt(ge.ALTITUDE_ABSOLUTE).getLatitude());
+			newLng = startViewChange.pointLngStart - (startViewChange.camLngStart - ge.getView().copyAsLookAt(ge.ALTITUDE_ABSOLUTE).getLongitude());
+			dataset.boxColorChange(newLat,newLng);
 		}
 	});
 }
@@ -288,10 +301,10 @@ function makePolygon(latI, lngI) {
         UL: {
             lat: startCoords.UL.lat + (latI * -cellSize),
             lng: startCoords.UL.lng + (lngI * -cellSize)
-        },
+        }
     };
     
-    var innerDiff = (startCoords.LR.lng - startCoords.LL.lng) * LINE_WIDTH;
+    var innerDiff = cellSize * LINE_WIDTH;
 
     var outer = ge.createLinearRing('');
     outer.getCoordinates().pushLatLngAlt(newCoords.LL.lat, newCoords.LL.lng, startCoords.LL.alt);
@@ -327,23 +340,23 @@ $(document).ready(function() {
         
         startCoords = {
             UL: {
-                lat: Number($('#startULLat').val()),
-                lng: Number($('#startULLng').val()),
+                lat: Number($('#startURLat').val()),
+                lng: Number($('#startURLng').val() - cellSize),
                 alt: Number($('#startAlt').val())
             },
             LL: {
-                lat: Number($('#startULLat').val()) - cellSize,
-                lng: Number($('#startULLng').val()),
+                lat: Number($('#startURLat').val() - cellSize),
+                lng: Number($('#startURLng').val() - cellSize),
                 alt: Number($('#startAlt').val())
             },
             LR: {
-                lat: Number($('#startULLat').val()) - cellSize,
-                lng: Number($('#startULLng').val()) + cellSize,
+                lat: Number($('#startURLat').val() - cellSize),
+                lng: Number($('#startURLng').val()),
                 alt: Number($('#startAlt').val())
             },
             UR: {
-                lat: Number($('#startULLat').val()),
-                lng: Number($('#startULLng').val()) + cellSize,
+                lat: Number($('#startURLat').val()),
+                lng: Number($('#startURLng').val()),
                 alt: Number($('#startAlt').val())
             }
         };	
