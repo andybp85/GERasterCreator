@@ -79,7 +79,6 @@ function failureCallback(errorCode) {
 //         }
 //         return methods;
 //     }
-    
 // }
 
 function createArray(length) {
