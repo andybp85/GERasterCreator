@@ -165,15 +165,15 @@ var dataset = {
 					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ffae33ff');
 					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ffae33ff');
 				} else if ( this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().get() == "ff00008b" || this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().get() ==  'ffae33ff') {
-					this.grid[LL.latI][LL.lngI] = 1;
+					this.grid[LL.latI][LL.lngI] = 0;
 					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ffffffff');
 					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ffffffff');
 				} else {
-					this.grid[LL.latI][LL.lngI] = 0;
+					this.grid[LL.latI][LL.lngI] = 1;
 					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ff00008b');
 					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ff00008b');
 				}        
-			
+				
 				this.render();
 			
 				this.oldID = (LL.lngI * 10) + LL.latI;
@@ -223,6 +223,7 @@ function clickInit() {
 			startViewChange.camLngStart = ge.getView().copyAsLookAt(ge.ALTITUDE_ABSOLUTE).getLongitude();
 			startViewChange.pointLatStart = Number($('#latPos').text());
 			startViewChange.pointLngStart = Number($('#lngPos').text());
+			//console.log(startViewChange);
 		}
 	});
 	
@@ -230,6 +231,7 @@ function clickInit() {
 		if (mbutton) {
  			newLat = startViewChange.pointLatStart - (startViewChange.camLatStart - ge.getView().copyAsLookAt(ge.ALTITUDE_ABSOLUTE).getLatitude());
 			newLng = startViewChange.pointLngStart - (startViewChange.camLngStart - ge.getView().copyAsLookAt(ge.ALTITUDE_ABSOLUTE).getLongitude());
+			//console.log(newLat + "," + newLng);
 			dataset.boxColorChange(newLat,newLng);
 		}
 	});
