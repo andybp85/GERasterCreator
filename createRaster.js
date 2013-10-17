@@ -92,6 +92,12 @@ function createArray(length) {
     return arr;
 }
 
+function download(filename, text) {
+    var pom = document.createElement('a');
+    pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    pom.setAttribute('download', filename);
+    pom.click();
+}
 //--DATASET-CREATOR----------------------------------
 var dataset = {
     rasterMap : {
@@ -388,4 +394,10 @@ $(document).ready(function() {
 		noData.checked = $('#nodata-box')[0].checked;
     });
 
+
+	$('#download').click(function(){
+		download( $('#filename').val(), $('#output').val() );
+	});
+	
+	
 });

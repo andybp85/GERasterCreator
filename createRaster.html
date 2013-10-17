@@ -15,10 +15,9 @@
       }
       #map3d {
           float:left;
-          height:900px;
+          height:800px;
           margin-right:10px;
-          width:1200px;
-          
+          width:1000px;
       }
       #controls {
           border:1px solid black;
@@ -28,17 +27,23 @@
       }
       #vers {
           position: absolute;
-          top: 920px;
+          top: 820px;
       }
       #output {
           left: 10px;
           position: absolute;
-          top: 950px;
+          top: 850px;
       }
       #download {
           left: 580px;
           position: absolute;
-          top: 620px;
+          top: 820px;
+      }
+      #filename {
+          left: 450px;
+          position: absolute;
+          top: 820px;
+        
       }
       #nodata {
           width: 40px;
@@ -108,7 +113,7 @@
     Installed Plugin Version: <span id="installed-plugin-version" style=
     "font-weight: bold;">Loading...</span>
   </div>
-<!--   <input type="button" id="download" value="Download raster dataset" />  -->
+  <input type="button" id="download" value="Download raster dataset" /><input type="text" id="filename" value="dataset.ascii" />
   <br />
   
   <textarea rows="50" cols="100" id="output"></textarea>
