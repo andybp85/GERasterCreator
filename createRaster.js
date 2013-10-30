@@ -94,7 +94,7 @@ function createArray(length) {
 
 function download(filename, text) {
     var pom = document.createElement('a');
-    pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    pom.setAttribute('href', 'data:text/plain;charset=us-ascii,' + encodeURIComponent(text));
     pom.setAttribute('download', filename);
     pom.click();
 }
