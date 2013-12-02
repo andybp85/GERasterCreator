@@ -35,12 +35,23 @@
           top: 850px;
       }
       #download {
-          left: 580px;
+          left: 480px;
+          position: absolute;
+          top: 820px;
+      }
+      #downloadKML {
+          left: 620px;
           position: absolute;
           top: 820px;
       }
       #filename {
-          left: 450px;
+          left: 350px;
+          position: absolute;
+          top: 820px;
+        
+      }
+      label[for="filename"] {
+          left: 285px;
           position: absolute;
           top: 820px;
         
@@ -96,8 +107,8 @@
       Polygon Alt: <input type="text" id="startAlt" value="0"/>
       
       <br /><br />
-      # Lat Boxes: <input type="text" id="numLat" value="50" /><br />
-      # Long Boxes: <input type="text" id="numLng" value="50" />
+      # Lat Boxes: <input type="text" id="numLat" value="10" /><br />
+      # Long Boxes: <input type="text" id="numLng" value="10" />
       
       <br />
       <input type="button" id="drawMap" value="Draw" />
@@ -113,7 +124,7 @@
     Installed Plugin Version: <span id="installed-plugin-version" style=
     "font-weight: bold;">Loading...</span>
   </div>
-  <input type="button" id="download" value="Download raster dataset" /><input type="text" id="filename" value="dataset.txt" />
+  <input type="button" id="downloadKML" value="Download kml" /><input type="button" id="download" value="Download raster dataset" /><label for="filename">filename: </label><input type="text" id="filename" value="dataset" />
   <br />
   
   <textarea rows="50" cols="100" id="output"></textarea>

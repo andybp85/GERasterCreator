@@ -11,7 +11,6 @@ var LLCorner = {'X':0,'Y':0};
 
 var ge = null;
 var la = null;
-var currentProjectionFolder = null;
 
 var newCoords = null;
 var mbutton = false;
@@ -107,17 +106,7 @@ var dataset = {
     oldID : null,
 	
     createMap : function () {
-        
         this.grid = createArray(numLat,numLng);
-		this.placemarks = createArray(numLat,numLng);
-        var id = 0;
-        for (var i = 0; i < numLat; i++) {
-            for (var j = 0; j < numLng; j++) {
-                this.grid[i][j] = 0;
-				this.placemarks[i][j] = ge.createPlacemark( (id).toString() );
-				id++;
-            }
-        }
     },
 
     addLat : function(id,LRlatVal){ 
@@ -164,11 +153,13 @@ var dataset = {
         if (mbutton) {
 			
 			var LL = dataset.getBox(lat,lng);
-							
+			
+			//need to change this				
 			if ( this.oldID != ( ( LL.lngI * 10) + LL.latI ) ) {
 				if (noData.checked) {
 					this.grid[LL.latI][LL.lngI] = noData.val;
 					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ffae33ff');
+					// somthing like ge.getfeatures().getSomethingById("#").getStyle...
 					this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ffae33ff');
 				} else if ( this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().get() == "ff00008b" || this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().get() ==  'ffae33ff') {
 					this.grid[LL.latI][LL.lngI] = 0;
@@ -208,8 +199,10 @@ function clickInit() {
     });
     
     google.earth.addEventListener(ge.getGlobe(), 'mousemove', function(event) {
-        $('#latPos').html(event.getLatitude());
-        $('#lngPos').html(event.getLongitude());
+		document.getElementById('latPos').innerHTML = event.getLatitude();
+        //$('#latPos').html(event.getLatitude());
+		document.getElementById('lngPos').innerHTML = event.getLongitude();
+        //$('#lngPos').html(event.getLongitude());
 		if (mbutton && event.getTarget ().getType() == 'KmlPlacemark' && event.getTarget().getGeometry().getType() == 'KmlPolygon') {
 			event.preventDefault();
 			dataset.boxColorChange(event.getLatitude(),event.getLongitude());
@@ -244,7 +237,8 @@ function clickInit() {
 }
 
 function initGrid() {
-	RemoveAllFeatures();
+	//RemoveAllFeatures();
+	// something like ge.getFeatures().removeChild(grid);
 
 	// set the camera view
 	var la = ge.createLookAt('');
@@ -257,7 +251,7 @@ function initGrid() {
 	
 	var grid = ge.createFolder("grid");
 	
-	genPolygons();
+	genPolygons(grid);
 	
 	for (x = 0; x < dataset.placemarks.length; x++) {
 		for (y = 0; y < dataset.placemarks[x].length; y++) {
@@ -272,14 +266,18 @@ function initGrid() {
     clickInit();
 }
 
-function genPolygons() {
+function genPolygons(folder) {
+	
+	var id = 0;
+    
     for (var lngI = 0; lngI < numLng; lngI++) {
-        makePolygon(0, lngI);
+        makePolygon(0, lngI, folder, id);
         dataset.addLng(lngI,newCoords.LR.lng);
         dataset.addLat(0,newCoords.LR.lat)
         
         for (var latI = 1; latI < numLat; latI++) {
-            makePolygon(latI, lngI);
+            makePolygon(latI, lngI, folder, id);
+			id++;
 			LLCorner.X = newCoords.LL.lng;
         	LLCorner.Y = newCoords.LL.lat;
             if (lngI === 0) {
@@ -290,10 +288,11 @@ function genPolygons() {
     dataset.render();
 }
 
-function makePolygon(latI, lngI) {
+function makePolygon(latI, lngI, folder, id) {
     
     var polygon = ge.createPolygon('');
-    dataset.placemarks[latI][lngI].setGeometry(polygon);
+	var placemark = ge.createPlacemark( (id).toString() );
+    placemark.setGeometry(polygon);
     
 //     var lngDiff = startCoords.LL.lng - startCoords.LR.lng;
 //     var latDiff = startCoords.LR.lat - startCoords.UR.lat;
@@ -337,9 +336,11 @@ function makePolygon(latI, lngI) {
         dataset.placemarks[latI][lngI].setStyleSelector(ge.createStyle(''));
     }    
 	
-    dataset.placemarks[latI][lngI].getStyleSelector().getLineStyle().setWidth(3);
-    dataset.placemarks[latI][lngI].getStyleSelector().getLineStyle().getColor().set('ffffffff');
-    dataset.placemarks[latI][lngI].getStyleSelector().getPolyStyle().setFill(1);
+    placemark.getStyleSelector().getLineStyle().setWidth(3);
+    placemark.getStyleSelector().getLineStyle().getColor().set('ffffffff');
+    placemark.getStyleSelector().getPolyStyle().setFill(1);
+	
+	folder.getFeatures().appendChild(placemark);
 }
 
 //--CONTROLS----------------------------------
