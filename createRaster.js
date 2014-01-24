@@ -14,6 +14,7 @@ var la = null;
 
 var newCoords = null;
 var mbutton = false;
+var innerGrid = null;
 
 var startViewChange = { 'camLatStart' : 0, 'camLngStart' : 0, 'pointLatStart' : 0, 'pointLngStart' : 0  };
 
@@ -93,42 +94,126 @@ function createArray(length) {
     return arr;
 }
 //--FILESYSTEM-------------------------------------
-var fs = {
+var filesys = {
+	fs: null,
 	 download: function(filename, text) {
 		var pom = document.createElement('a');
 		pom.setAttribute('href', 'data:text/plain;charset=us-ascii,' + encodeURIComponent(text));
 		pom.setAttribute('download', filename);
 		pom.click();
 	},
-	saveTemp: function() {
-		window.requestFileSystem(window.TEMPORARY, 5*1024*1024,function(){console.log('success')}, fs.errorHandler);
+	saveTempAndDL: function(filename, data) {
+		
+	    var blob = new Blob([ data  ], {type: 'text/plain'});
+	    var pom = document.createElement('a');
+	    pom.setAttribute("href", window.URL.createObjectURL(blob));
+	    pom.setAttribute('download', filename);
+		pom.click();
+		
+//		window.requestFileSystem(window.TEMPORARY, 1024*1024, function(fs) {
+//			
+//		  fs.root.getFile(name, {create: true}, function(fileEntry) {
+//
+//		    // Create a FileWriter object for our FileEntry (log.txt).
+//		    fileEntry.createWriter(function(fileWriter) {
+//
+//		      fileWriter.onwriteend = function(e) {
+//		        console.log('Write completed.');
+//		      };
+//
+//		      fileWriter.onerror = function(e) {
+//		        console.log('Write failed: ' + e.toString());
+//		      };
+//
+//		      // Create a new Blob and write to it
+//		      var blob = new Blob([ data  ], {type: 'text/plain'});
+//
+//
+//		      fileWriter.write(blob);
+//		      
+//			      fs.root.getFile('data.kml', {}, function(fileEntry) {
+//
+//					    // Get a File object representing the file,
+//					    // then use FileReader to read its contents.
+//					    fileEntry.file(function(file) {
+//					       var reader = new FileReader();
+//
+//					       reader.onloadend = function(e) {
+//					         //var txtArea = document.createElement('textarea');
+//					         console.log( this.result );
+//					         //document.body.appendChild(txtArea);
+//					       };
+//
+//					       reader.readAsText(file);
+//					    }, filesys.errorHandler);
+//
+//					  }, filesys.errorHandler);
+
+//		    }, filesys.errorHandler);
+//
+//		  }, filesys.errorHandler);
+//
+//		}, this.errorHandler);
+//		
+	
+
+//		window.requestFileSystem(window.TEMPORARY, 1024*1024, onInitFs, this.errorHandler);
+		
+//		filesys.fs.root.getFile('kml', {}, function(fileEntry) {
+//
+//		    // Get a File object representing the file,
+//		    // then use FileReader to read its contents.
+//		    fileEntry.file(function(file) {
+//		       var reader = new FileReader();
+//
+//		       reader.onloadend = function(e) {
+//		         var txtArea = document.createElement('textarea');
+//		         txtArea.value = this.result;
+//		         document.body.appendChild(txtArea);
+//		       };
+//
+//		       reader.readAsText(file);
+//		    }, filesys.errorHandler);
+//
+//		  }, filesys.errorHandler);
+		
+		
+//		window.requestFileSystem(window.PERSISTENT, 1024*1024, function(fs){
+//			console.log(fs);
+//		}, function(e) {
+//			console.log(e);
+//		});
+// 		});
 	},
 	errorHandler: function(e) {
-	  var msg = '';
+	    alert('Error: ' + e.message);
+	},
+	onInitFs : function(filesys) {
+		console.log( filesys );
+	  filesys.root.getFile(this.name, {create: true}, function(fileEntry) {
 	
-	  switch (e.code) {
-		case FileError.QUOTA_EXCEEDED_ERR:
-		  msg = 'QUOTA_EXCEEDED_ERR';
-		  break;
-		case FileError.NOT_FOUND_ERR:
-		  msg = 'NOT_FOUND_ERR';
-		  break;
-		case FileError.SECURITY_ERR:
-		  msg = 'SECURITY_ERR';
-		  break;
-		case FileError.INVALID_MODIFICATION_ERR:
-		  msg = 'INVALID_MODIFICATION_ERR';
-		  break;
-		case FileError.INVALID_STATE_ERR:
-		  msg = 'INVALID_STATE_ERR';
-		  break;
-		default:
-		  msg = 'Unknown Error';
-		  break;
-	  };
+		// Create a FileWriter object for our FileEntry (log.txt).
+		fileEntry.createWriter(function(fileWriter) {
 	
-	  console.log('Error: ' + msg);
+		  fileWriter.onwriteend = function(e) {
+			console.log('Write completed.');
+		  };
+	
+		  fileWriter.onerror = function(e) {
+			console.log('Write failed: ' + e.toString());
+		  };
+	
+		  // Create a new Blob and write it to log.txt.
+		  var blob = new Blob(['Lorem Ipsum'], {type: 'text/plain'});
+	
+		  fileWriter.write(blob);
+	
+		}, this.errorHandler);
+	
+	  }, this.errorHandler);
+	
 	}
+
 }
 //--DATASET-CREATOR----------------------------------
 var dataset = {
@@ -193,27 +278,18 @@ var dataset = {
 			var id = ( (LL.lngI * 10) + LL.latI ).toString();
 			
 			var placemarkStyle = ge.getElementById(id).getStyleSelector();
-			//console.log( this.oldID, parseInt(id) );
-			//console.log( ge.getElementById(id).getParentNode().getFeatures().getChildNodes().getLength() );
 			if ( this.oldID != id ) {
 				console.log( 'change' );
 				if (noData.checked) {
 					this.grid[LL.latI][LL.lngI] = noData.val;
-					//this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ffae33ff');
-					// somthing like ge.getfeatures().getSomethingById("#").getStyle...
-					//this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ffae33ff');
 					placemarkStyle.getLineStyle().getColor().set('ffae33ff');
 					placemarkStyle.getPolyStyle().getColor().set('ffae33ff');
 				} else if ( placemarkStyle.getPolyStyle().getColor().get() == "ff00008b" || placemarkStyle.getPolyStyle().getColor().get() == 'ffae33ff') {
 					this.grid[LL.latI][LL.lngI] = 0;
-					//this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ffffffff');
-					//this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ffffffff');
 					placemarkStyle.getLineStyle().getColor().set('ffffffff');
 					placemarkStyle.getPolyStyle().getColor().set('ffffffff');
 				} else {
 					this.grid[LL.latI][LL.lngI] = 1;
-					//this.placemarks[LL.latI][LL.lngI].getStyleSelector().getLineStyle().getColor().set('ff00008b');
-					//this.placemarks[LL.latI][LL.lngI].getStyleSelector().getPolyStyle().getColor().set('ff00008b');
 					placemarkStyle.getLineStyle().getColor().set('ff00008b');
 					placemarkStyle.getPolyStyle().getColor().set('ff00008b');
 				}        
@@ -297,16 +373,15 @@ function initGrid() {
     dataset.createMap();
 	
 	var grid = ge.createFolder("grid");
-	
 	genPolygons(grid);
-	
 // 	for (x = 0; x < dataset.placemarks.length; x++) {
 // 		for (y = 0; y < dataset.placemarks[x].length; y++) {
 // 			grid.getFeatures().appendChild(dataset.placemarks[x][y]);
 // 		}
 // 	}
-	
 	ge.getFeatures().appendChild(grid);
+	
+	innerGrid = ge.createFolder("innerGrid");
         
     clickInit();
 }
@@ -346,7 +421,7 @@ function genPolygons(folder) {
         makePolygon(0, lngI, folder, id);
 		id++;
         dataset.addLng(lngI,newCoords.LR.lng);
-        dataset.addLat(0,newCoords.LR.lat)
+        dataset.addLat(0,newCoords.LR.lat);
         
         for (var latI = 1; latI < numLat; latI++) {
             makePolygon(latI, lngI, folder, id);
@@ -393,17 +468,17 @@ function makePolygon(latI, lngI, folder, id) {
     var innerDiff = cellSize * LINE_WIDTH;
 
     var outer = ge.createLinearRing('');
-    outer.getCoordinates().pushLatLngAlt(newCoords.LL.lat, newCoords.LL.lng, startCoords.LL.alt);
-    outer.getCoordinates().pushLatLngAlt(newCoords.LR.lat, newCoords.LR.lng, startCoords.LR.alt);
-    outer.getCoordinates().pushLatLngAlt(newCoords.UR.lat, newCoords.UR.lng, startCoords.UR.alt);
-    outer.getCoordinates().pushLatLngAlt(newCoords.UL.lat, newCoords.UL.lng, startCoords.UL.alt);
+    outer.getCoordinates().pushLatLngAlt(newCoords.LL.lat, newCoords.LL.lng, (startCoords.LL.alt + 50));
+    outer.getCoordinates().pushLatLngAlt(newCoords.LR.lat, newCoords.LR.lng, (startCoords.LR.alt + 50));
+    outer.getCoordinates().pushLatLngAlt(newCoords.UR.lat, newCoords.UR.lng, (startCoords.UR.alt + 50));
+    outer.getCoordinates().pushLatLngAlt(newCoords.UL.lat, newCoords.UL.lng, (startCoords.UL.alt + 50));
     polygon.setOuterBoundary(outer);
 
     var inner = ge.createLinearRing('');
-    inner.getCoordinates().pushLatLngAlt(newCoords.LL.lat + innerDiff, newCoords.LL.lng + innerDiff, startCoords.LL.alt);
-    inner.getCoordinates().pushLatLngAlt(newCoords.LR.lat + innerDiff, newCoords.LR.lng - innerDiff, startCoords.LR.alt);
-    inner.getCoordinates().pushLatLngAlt(newCoords.UR.lat - innerDiff, newCoords.UR.lng - innerDiff, startCoords.UR.alt);
-    inner.getCoordinates().pushLatLngAlt(newCoords.UL.lat - innerDiff, newCoords.UL.lng + innerDiff, startCoords.UL.alt);
+    inner.getCoordinates().pushLatLngAlt(newCoords.LL.lat + innerDiff, newCoords.LL.lng + innerDiff, (startCoords.LL.alt + 50));
+    inner.getCoordinates().pushLatLngAlt(newCoords.LR.lat + innerDiff, newCoords.LR.lng - innerDiff, (startCoords.LR.alt + 50));
+    inner.getCoordinates().pushLatLngAlt(newCoords.UR.lat - innerDiff, newCoords.UR.lng - innerDiff, (startCoords.UR.alt + 50));
+    inner.getCoordinates().pushLatLngAlt(newCoords.UL.lat - innerDiff, newCoords.UL.lng + innerDiff, (startCoords.UL.alt + 50));
     polygon.getInnerBoundaries().appendChild(inner);
 
     if (!placemark.getStyleSelector()) {
@@ -415,6 +490,51 @@ function makePolygon(latI, lngI, folder, id) {
     placemark.getStyleSelector().getPolyStyle().setFill(1);
 	
 	folder.getFeatures().appendChild(placemark);
+}
+
+function drawInnerLines(folder) {
+	
+	var startLat = startCoords.UR.lat,
+		startLng = startCoords.UR.lng,
+		newLng = 0,
+		newLat = 0;
+	
+	for (var lngI = 0; lngI < numLng; lngI++) {
+		for (var decLngI = 0; decLngI < 1; decLngI += (1/3) )   {
+			newLng = startLng + ( ( decLngI + lngI) * -cellSize );
+			addLine(startLat, newLng, startLat + ( numLng * -cellSize ), newLng, startCoords.UR.alt, folder);
+		}
+	}
+	
+	for (var latI = 0; latI < numLat; latI++) {
+		for (var decLatI = 0; decLatI < 1; decLatI += (1/3) ) {
+			newLat = startLat + ( ( decLatI +latI ) * -cellSize );
+			addLine(newLat, startLng, newLat, startLng  + ( numLat * -cellSize ), startCoords.UR.alt, folder);
+		}
+	}
+}
+
+function addLine(lat1,lng1,lat2,lng2,alt,folder){
+	// Create the placemark
+	var lineStringPlacemark = ge.createPlacemark('');
+	
+	// Create the LineString
+	var lineString = ge.createLineString('');
+	lineStringPlacemark.setGeometry(lineString);
+	
+	// Create a style and set width and color of line
+	lineStringPlacemark.setStyleSelector(ge.createStyle(''));
+	var lineStyle = lineStringPlacemark.getStyleSelector().getLineStyle();
+	lineStyle.setWidth(5);
+	lineStyle.getColor().set('99CCCCCC');  // aabbggrr format
+
+	
+	// Add LineString points
+	lineString.getCoordinates().pushLatLngAlt(lat1, lng1, alt);
+	lineString.getCoordinates().pushLatLngAlt(lat2, lng2, alt);
+	
+	// Add the feature to Earth
+	folder.getFeatures().appendChild(lineStringPlacemark);
 }
 
 //--CONTROLS----------------------------------
@@ -462,8 +582,6 @@ document.addEventListener('DOMContentLoaded',function(){
 	
 	for (var i = 0; i < upOpts.length; ++i) {
 		
-	
-		
 		upOpts[i].addEventListener('click', function(e) {
 			
 			var options = ge.getOptions();
@@ -482,13 +600,27 @@ document.addEventListener('DOMContentLoaded',function(){
 		});
 	}
 
-
+	document.getElementById('guideGrid').addEventListener('click', function(){
+		
+		
+		if ( this.checked ) {
+			
+			
+			drawInnerLines(innerGrid);
+			//console.log( innerGrid.getKml() );
+			ge.getFeatures().appendChild(innerGrid);
+			
+		} else {
+			ge.getFeatures().removeChild(innerGrid);
+		}
+	});
+	
 	document.getElementById('download').addEventListener('click', function(){
-		fs.download( document.getElementById('filename').value + ".txt", document.getElementById('output').value );
+		filesys.download( document.getElementById('filename').value + ".txt", document.getElementById('output').value );
 	});
 	
 	document.getElementById('downloadKML').addEventListener('click', function(){
- 		fs.saveTemp();// $('#filename').val() + ".kml", ge.getFeatures().getFirstChild().getKml() );
+		filesys.saveTempAndDL( "data.kml", ge.getElementById('grid').getKml() );// $('#filename').val() + ".kml", ge.getFeatures().getFirstChild().getKml() );
 		//console.log(ge.getFeatures().getFirstChild().getKml());
 		
 // 		ge.getFeatures().getFirstChild().getKml().toBlob(function(blob) {
