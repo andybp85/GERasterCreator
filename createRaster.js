@@ -11,7 +11,7 @@ it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Foobar is distributed in the hope that it will be useful,
+GE Raster Creator is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
@@ -619,17 +619,19 @@ function drawInnerLines(folder) {
     var startLat = startCoords.UR.lat,
         startLng = startCoords.UR.lng,
         newLng = 0,
-        newLat = 0;
+        newLat = 0,
+        gridPcnt = 3;
+        //gridPcnt = document.getElementById('guideGridSize').value;
 
     for (var lngI = 0; lngI < numLng; lngI++) {
-        for (var decLngI = 0; decLngI < 1; decLngI += (1 / 3)) {
+        for (var decLngI = 0; decLngI < 1; decLngI += (1 / gridPcnt)) {
             newLng = startLng + ((decLngI + lngI) * -cellSize);
             addLine(startLat, newLng, startLat + (numLng * -cellSize), newLng, startCoords.UR.alt, folder);
         }
     }
 
     for (var latI = 0; latI < numLat; latI++) {
-        for (var decLatI = 0; decLatI < 1; decLatI += (1 / 3)) {
+        for (var decLatI = 0; decLatI < 1; decLatI += (1 / gridPcnt)) {
             newLat = startLat + ((decLatI + latI) * -cellSize);
             addLine(newLat, startLng, newLat, startLng + (numLat * -cellSize), startCoords.UR.alt, folder);
         }
@@ -637,6 +639,7 @@ function drawInnerLines(folder) {
 }
 
 function addLine(lat1, lng1, lat2, lng2, alt, folder) {
+    
     // Create the placemark
     var lineStringPlacemark = ge.createPlacemark('');
 
@@ -728,6 +731,7 @@ document.addEventListener('DOMContentLoaded', function () {
             ge.getFeatures().appendChild(innerGrid);
         } else {
             ge.getFeatures().removeChild(innerGrid);
+            //innerGrid.release();
         }
     });
 
