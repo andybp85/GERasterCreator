@@ -1,13 +1,40 @@
-//--GLOBALS---------------------------------
+/* Copyright info: 
 
+Andrew Stanish 
+2014
+andybp85 at gmail
+
+This file is part of GE Raster Creator. 
+
+GE Raster Creator is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Foobar is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GE Raster Creator.  If not, see <http://www.gnu.org/licenses/>.
+
+*/
+//--GLOBALS---------------------------------
 var LINE_WIDTH = 0.04479550075655295;
 
 var startCoords = null;
 var numLng = null;
 var numLat = null;
 var cellSize = null;
-var noData = { "checked":false,'val':null };
-var LLCorner = {'X':0,'Y':0};
+var noData = {
+    "checked": false,
+    'val': null
+};
+var LLCorner = {
+    'X': 0,
+    'Y': 0
+};
 
 var ge = null;
 var la = null;
@@ -16,34 +43,39 @@ var newCoords = null;
 var mbutton = false;
 var innerGrid = null;
 
-var startViewChange = { 'camLatStart' : 0, 'camLngStart' : 0, 'pointLatStart' : 0, 'pointLngStart' : 0  };
+var startViewChange = {
+    'camLatStart': 0,
+    'camLngStart': 0,
+    'pointLatStart': 0,
+    'pointLngStart': 0
+};
 
-window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
+window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
 
 //--GOOGLE-EARTH------------------------------
 
 google.load("earth", "1");
 
 function init() {
-	google.earth.createInstance('map3d', initCallback, failureCallback);
+    google.earth.createInstance('map3d', initCallback, failureCallback);
 }
 
 function initCallback(instance) {
-	ge = instance;
-	ge.getWindow().setVisibility(true);
-	
-	// add some layers
-	ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
-	ge.getLayerRoot().enableLayerById(ge.LAYER_ROADS, true);
-	ge.getLayerRoot().enableLayerById(ge.LAYER_TERRAIN, true);
-	ge.getLayerRoot().enableLayerById(ge.LAYER_TREES, true);
-	ge.getOptions().setStatusBarVisibility(true);
-	
-	document.getElementById('installed-plugin-version').innerHTML = ge.getPluginVersion().toString();
+    ge = instance;
+    ge.getWindow().setVisibility(true);
+
+    // add some layers
+    ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
+    ge.getLayerRoot().enableLayerById(ge.LAYER_ROADS, true);
+    ge.getLayerRoot().enableLayerById(ge.LAYER_TERRAIN, true);
+    ge.getLayerRoot().enableLayerById(ge.LAYER_TREES, true);
+    ge.getOptions().setStatusBarVisibility(true);
+
+    document.getElementById('installed-plugin-version').innerHTML = ge.getPluginVersion().toString();
 }
 
 function failureCallback(errorCode) {
-	alert(errorCode);
+    alert(errorCode);
 }
 
 //--UTILITY-FUNCTIONS----------------------------------
@@ -61,7 +93,7 @@ function failureCallback(errorCode) {
 // }
 
 // var Reflector = function(obj) {
-    
+
 //     this.getProperties = function() {
 //         var properties = [];
 //         for (var prop in obj) {
@@ -71,7 +103,7 @@ function failureCallback(errorCode) {
 //         }
 //         return properties;
 //     }
-  
+
 //     this.getAllMethods = function() {
 //         var methods = [];
 //         for (var method in obj) {
@@ -84,70 +116,132 @@ function failureCallback(errorCode) {
 // }
 
 function createArray(length) {
-	var arr = Array.apply(null, new Array(length || 0)).map(Number.prototype.valueOf,0),
-    	i = length;
+    var arr = Array.apply(null, new Array(length || 0)).map(Number.prototype.valueOf, 0),
+        i = length;
 
     if (arguments.length > 1) {
         var args = Array.prototype.slice.call(arguments, 1);
-        while(i--) arr[length-1 - i] = createArray.apply(this, args);
+        while (i--) arr[length - 1 - i] = createArray.apply(this, args);
     }
     return arr;
 }
+
+function fireEvent(obj, evt) {
+    var fireOnThis = obj;
+    if (document.createEvent) {
+        var evObj = document.createEvent('MouseEvents');
+        evObj.initEvent(evt, true, false);
+        fireOnThis.dispatchEvent(evObj);
+    } else if (document.createEventObject) { //IE
+        var evObj = document.createEventObject();
+        fireOnThis.fireEvent('on' + evt, evObj);
+    }
+}
 //--FILESYSTEM-------------------------------------
 var filesys = {
-	fs: null,
-	 download: function(filename, text) {
-		var pom = document.createElement('a');
-		pom.setAttribute('href', 'data:text/plain;charset=us-ascii,' + encodeURIComponent(text));
-		pom.setAttribute('download', filename);
-		pom.click();
-	},
-	saveTempAndDL: function(filename, data) {
-		
-	    var blob = new Blob([ data  ], {type: 'text/plain'});
-	    var pom = document.createElement('a');
-	    pom.setAttribute("href", window.URL.createObjectURL(blob));
-	    pom.setAttribute('download', filename);
-		pom.click();
-		
-//		window.requestFileSystem(window.TEMPORARY, 1024*1024, function(fs) {
-//			
-//		  fs.root.getFile(name, {create: true}, function(fileEntry) {
+    fs: null,
+    upfile: null,
+    download: function (filename, data) {
+        var blob = new Blob([data], {
+            type: 'text/plain'
+        });
+        var pom = document.createElement('a');
+        pom.setAttribute("href", window.URL.createObjectURL(blob));
+        pom.setAttribute('download', filename);
+        pom.click();
+    },
+    uploadRaster: function (evt) {
+        var files = evt.target.files; // FileList object
+
+        // Loop through the FileList and render image files as thumbnails.
+        for (var i = 0, f; f = files[i]; i++) {
+
+            // Only process image files.
+            //	      if (!f.type.match('image.*')) {
+            //	        continue;
+            //	      }
+
+            var reader = new FileReader();
+
+            // Closure to capture the file information.
+            reader.onload = (function (theFile) {
+                return function (e) {
+                    filesys.upfile = e.target.result;
+                    var raster = filesys.upfile.split(/\s+/);
+                    //document.getElementById('output').value = filesys.upfile;
+                    var i = 0;
+                    while (isNaN(raster[i]) || isNaN(raster[i + 1])) {
+                        switch (raster[i]) {
+                        case 'NCOLS':
+                            document.getElementById('numLng').value = raster[i + 1];
+                            numLng = raster[i + 1];
+                            break;
+                        case 'NROWS':
+                            document.getElementById('numLat').value = raster[i + 1];
+                            numLat = raster[i + 1];
+                            break;
+                        case 'CELLSIZE':
+                            document.getElementById('cellSize').value = raster[i + 1];
+                            cellSize = raster[i + 1];
+                            break;
+                        case 'NODATA_VALUE':
+                            document.getElementById('nodata').value = raster[i + 1];
+                            break;
+                        }
+                        i++;
+                    }
+                    var i = 0;
+                    while (isNaN(raster[i]) || isNaN(raster[i + 1])) {
+                        switch (raster[i]) {
+                        case 'XLLCORNER':
+                            document.getElementById('startURLng').value = (Number(raster[i + 1]) + (numLng * cellSize));
+                            break;
+                        case 'YLLCORNER':
+                            //console.log(raster[i + 1], numLat, cellSize, Number(raster[i + 1]) + (numLat * cellSize));
+                            document.getElementById('startURLat').value = (Number(raster[i + 1]) + (numLat * cellSize));
+                            break;
+                        }
+                        i++;
+                    }
+                    fireEvent(document.getElementById('drawMap'), 'click');
+                };
+
+            })(f);
+
+            // Read in the image file as a data URL.
+            reader.readAsText(f);
+        }
+    },
+};
+//	init : function() {
+//		window.webkitStorageInfo.requestQuota(PERSISTENT, 1024*1024, function(grantedBytes) {
+//			window.requestFileSystem(window.PERSISTENT, grantedBytes, function(fs){
+//				filesys.fs  = fs;z
+//			}, filesys.errorHandler);
+//		}, filesys.errorHandler);
+//	},
+//	save : function(filename, data) {
 //
-//		    // Create a FileWriter object for our FileEntry (log.txt).
-//		    fileEntry.createWriter(function(fileWriter) {
+//	  fs.root.getFile(name, {create: true}, function(fileEntry) {
 //
-//		      fileWriter.onwriteend = function(e) {
-//		        console.log('Write completed.');
-//		      };
+//	    // Create a FileWriter object for our FileEntry (log.txt).
+//	    fileEntry.createWriter(function(fileWriter) {
 //
-//		      fileWriter.onerror = function(e) {
-//		        console.log('Write failed: ' + e.toString());
-//		      };
+//	      fileWriter.onwriteend = function(e) {
+//	        console.log('Write completed.');
+//	      };
 //
-//		      // Create a new Blob and write to it
-//		      var blob = new Blob([ data  ], {type: 'text/plain'});
+//	      fileWriter.onerror = function(e) {
+//	        console.log('Write failed: ' + e.toString());
+//	      };
 //
+//	      // Create a new Blob and write to it
+//	      var blob = new Blob([ data  ], {type: 'text/plain'});
 //
-//		      fileWriter.write(blob);
-//		      
-//			      fs.root.getFile('data.kml', {}, function(fileEntry) {
-//
-//					    // Get a File object representing the file,
-//					    // then use FileReader to read its contents.
-//					    fileEntry.file(function(file) {
-//					       var reader = new FileReader();
-//
-//					       reader.onloadend = function(e) {
-//					         //var txtArea = document.createElement('textarea');
-//					         console.log( this.result );
-//					         //document.body.appendChild(txtArea);
-//					       };
-//
-//					       reader.readAsText(file);
-//					    }, filesys.errorHandler);
-//
-//					  }, filesys.errorHandler);
+//	      fileWriter.write(blob);
+//	    });
+//	  });
+
 
 //		    }, filesys.errorHandler);
 //
@@ -155,10 +249,10 @@ var filesys = {
 //
 //		}, this.errorHandler);
 //		
-	
+
 
 //		window.requestFileSystem(window.TEMPORARY, 1024*1024, onInitFs, this.errorHandler);
-		
+
 //		filesys.fs.root.getFile('kml', {}, function(fileEntry) {
 //
 //		    // Get a File object representing the file,
@@ -176,128 +270,156 @@ var filesys = {
 //		    }, filesys.errorHandler);
 //
 //		  }, filesys.errorHandler);
-		
-		
+
+
 //		window.requestFileSystem(window.PERSISTENT, 1024*1024, function(fs){
 //			console.log(fs);
 //		}, function(e) {
 //			console.log(e);
 //		});
 // 		});
-	},
-	errorHandler: function(e) {
-	    alert('Error: ' + e.message);
-	},
-	onInitFs : function(filesys) {
-		console.log( filesys );
-	  filesys.root.getFile(this.name, {create: true}, function(fileEntry) {
-	
-		// Create a FileWriter object for our FileEntry (log.txt).
-		fileEntry.createWriter(function(fileWriter) {
-	
-		  fileWriter.onwriteend = function(e) {
-			console.log('Write completed.');
-		  };
-	
-		  fileWriter.onerror = function(e) {
-			console.log('Write failed: ' + e.toString());
-		  };
-	
-		  // Create a new Blob and write it to log.txt.
-		  var blob = new Blob(['Lorem Ipsum'], {type: 'text/plain'});
-	
-		  fileWriter.write(blob);
-	
-		}, this.errorHandler);
-	
-	  }, this.errorHandler);
-	
-	}
+//	},
+//	read : function() {
+//		fs.root.getFile('data.kml', {}, function(fileEntry) {
+//
+//		    // Get a File object representing the file,
+//		    // then use FileReader to read its contents.
+//		    fileEntry.file(function(file) {
+//		       var reader = new FileReader();
+//
+//		       reader.onloadend = function(e) {
+//		         //var txtArea = document.createElement('textarea');
+//		         console.log( this.result );
+//		         //document.body.appendChild(txtArea);
+//		       };
+//
+//		       reader.readAsText(file);
+//		    }, filesys.errorHandler);
+//
+//		  }, filesys.errorHandler);
+//	},
+//	errorHandler: function(e) {
+//	    alert('Error: ' + e.message);
+//	},
+//	onInitFs : function(filesys) {
+//		console.log( filesys );
+//	  filesys.root.getFile(this.name, {create: true}, function(fileEntry) {
+//	
+//		// Create a FileWriter object for our FileEntry (log.txt).
+//		fileEntry.createWriter(function(fileWriter) {
+//	
+//		  fileWriter.onwriteend = function(e) {
+//			console.log('Write completed.');
+//		  };
+//	
+//		  fileWriter.onerror = function(e) {
+//			console.log('Write failed: ' + e.toString());
+//		  };
+//	
+//		  // Create a new Blob and write it to log.txt.
+//		  var blob = new Blob(['Lorem Ipsum'], {type: 'text/plain'});
+//	
+//		  fileWriter.write(blob);
+//	
+//		}, this.errorHandler);
+//	
+//	  }, this.errorHandler);
+//	
+//	}
 
-}
+
 //--DATASET-CREATOR----------------------------------
 var dataset = {
-    rasterMap : {
-        LRlngVals : {},
-        LRlatVals : {}
+    rasterMap: {
+        LRlngVals: {},
+        LRlatVals: {}
     },
-    oldID : -1,
-	
-    createMap : function () {
-        this.grid = createArray(numLat,numLng);
+    oldID: -1,
+
+    createMap: function () {
+        this.grid = createArray(numLat, numLng);
     },
 
-    addLat : function(id,LRlatVal){ 
+    addLat: function (id, LRlatVal) {
         this.rasterMap.LRlatVals[id] = LRlatVal;
     },
-    addLng : function(id,LRlngVal){ 
+    addLng: function (id, LRlngVal) {
         this.rasterMap.LRlngVals[id] = LRlngVal;
     },
-    
-    render : function() {
+
+    render: function () {
         var data = 'NCOLS ' + numLng + "\n";
         data += 'NROWS ' + numLat + "\n";
         data += 'XLLCORNER ' + LLCorner.X + "\n";
         data += 'YLLCORNER ' + LLCorner.Y + "\n";
-        data += 'CELLSIZE ' + cellSize +  "\n";
-        data += 'NODATA_VALUE ' + noData.val +  "\n\n";
-         
-         for (var iLat  = 0; iLat < numLat; iLat++) {
-             for (var iLng = numLng-1; iLng >= 0; iLng--) {
-				 
-                 if (iLng != numLng-1) {
-                     data += ' ';
-                 }
-                 data += this.grid[iLat][iLng];
-             }
-             data += '\n';
-         }        
+        data += 'CELLSIZE ' + cellSize + "\n";
+        data += 'NODATA_VALUE ' + noData.val + "\n\n";
+
+        for (var iLat = 0; iLat < numLat; iLat++) {
+            for (var iLng = numLng - 1; iLng >= 0; iLng--) {
+
+                if (iLng != numLng - 1) {
+                    data += ' ';
+                }
+                //data += ((Number(iLng) * numLat ) + Number(iLat)).toString() + ':' + this.grid[iLat][iLng];
+                data += this.grid[iLat][iLng];
+            }
+            data += ' ';
+        }
         document.getElementById('output').innerHTML = data;
     },
-    
-    getBox : function (lat,lng) {
+
+    getBox: function (lat, lng) {
+		
         var latI = 0;
+		
         while (lat < this.rasterMap.LRlatVals[latI]) {
             latI++;
         }
-		
+
+
         var lngI = numLng - 1;
+
         while (lng > this.rasterMap.LRlngVals[lngI]) {
             lngI--;
         }
 
-        return {'latI' : latI,'lngI' : lngI};
+        return {
+            'latI': latI,
+            'lngI': lngI
+        };
     },
 
-    boxColorChange : function(lat,lng){
+    boxColorChange: function (lat, lng) {
         if (mbutton) {
 
-			var LL = dataset.getBox(lat,lng);
+            var LL = dataset.getBox(lat, lng);
+
+            var id = ( (Number(LL.lngI) * numLat ) + Number(LL.latI) ).toString() ;
 			
-			//need to change this
-			var id = ( (LL.lngI * 10) + LL.latI ).toString();
-			
-			var placemarkStyle = ge.getElementById(id).getStyleSelector();
-			if ( this.oldID != id ) {
-				console.log( 'change' );
-				if (noData.checked) {
-					this.grid[LL.latI][LL.lngI] = noData.val;
-					placemarkStyle.getLineStyle().getColor().set('ffae33ff');
-					placemarkStyle.getPolyStyle().getColor().set('ffae33ff');
-				} else if ( placemarkStyle.getPolyStyle().getColor().get() == "ff00008b" || placemarkStyle.getPolyStyle().getColor().get() == 'ffae33ff') {
-					this.grid[LL.latI][LL.lngI] = 0;
-					placemarkStyle.getLineStyle().getColor().set('ffffffff');
-					placemarkStyle.getPolyStyle().getColor().set('ffffffff');
-				} else {
-					this.grid[LL.latI][LL.lngI] = 1;
-					placemarkStyle.getLineStyle().getColor().set('ff00008b');
-					placemarkStyle.getPolyStyle().getColor().set('ff00008b');
-				}        
+            var placemarkStyle = ge.getElementById(id).getStyleSelector();
+            if (this.oldID != id) {
+                
+               //console.log(LL, id );//, ge.getElementById(id).getKml() );
 				
-				this.render();
-			
-				this.oldID = parseInt(id);
-			}
+                if (noData.checked) {
+                    this.grid[LL.latI][LL.lngI] = noData.val;
+                    placemarkStyle.getLineStyle().getColor().set('ffae33ff');
+                    placemarkStyle.getPolyStyle().getColor().set('ffae33ff');
+                } else if (placemarkStyle.getPolyStyle().getColor().get() == "ff00008b" || placemarkStyle.getPolyStyle().getColor().get() == 'ffae33ff') {
+                    this.grid[LL.latI][LL.lngI] = 0;
+                    placemarkStyle.getLineStyle().getColor().set('ffffffff');
+                    placemarkStyle.getPolyStyle().getColor().set('ffffffff');
+                } else {
+                    this.grid[LL.latI][LL.lngI] = 1;
+                    placemarkStyle.getLineStyle().getColor().set('ff00008b');
+                    placemarkStyle.getPolyStyle().getColor().set('ff00008b');
+                }
+
+                this.render();
+
+                this.oldID = parseInt(id);
+            }
         }
     }
 };
@@ -312,101 +434,101 @@ function RemoveAllFeatures() { //needs to take out just placemarks
 }
 
 function clickInit() {
-    
-    google.earth.addEventListener(ge.getWindow(), 'mousedown', function(event) {
-		if (event.getTarget().getType() == 'KmlPlacemark' && event.getTarget().getGeometry().getType() == 'KmlPolygon') {
-			mbutton = true;
-			event.preventDefault();
-        	dataset.boxColorChange(event.getLatitude(),event.getLongitude());
-		}
-    });
-    
-    google.earth.addEventListener(ge.getGlobe(), 'mousemove', function(event) {
-		document.getElementById('latPos').innerHTML = event.getLatitude();
-        //$('#latPos').html(event.getLatitude());
-		document.getElementById('lngPos').innerHTML = event.getLongitude();
-        //$('#lngPos').html(event.getLongitude());
-		if (mbutton && event.getTarget ().getType() == 'KmlPlacemark' && event.getTarget().getGeometry().getType() == 'KmlPolygon') {
-			event.preventDefault();
-			dataset.boxColorChange(event.getLatitude(),event.getLongitude());
-		}
-    });
-    
-    google.earth.addEventListener(ge.getWindow(), 'mouseup', function(event) {
-        if (mbutton) {
-            mbutton = false;
-			dataset.oldID = -1;
+
+    google.earth.addEventListener(ge.getWindow(), 'mousedown', function (event) {
+        if (event.getTarget().getType() == 'KmlPlacemark' && event.getTarget().getGeometry().getType() == 'KmlPolygon') {
+            mbutton = true;
+            event.preventDefault();
+            dataset.boxColorChange(event.getLatitude(), event.getLongitude());
         }
     });
-	
-	google.earth.addEventListener(ge.getView(), 'viewchangebegin', function(){
-		if (mbutton) {
-			startViewChange.camLatStart = ge.getView().copyAsLookAt(ge.ALTITUDE_ABSOLUTE).getLatitude();
-			startViewChange.camLngStart = ge.getView().copyAsLookAt(ge.ALTITUDE_ABSOLUTE).getLongitude();
-			startViewChange.pointLatStart = Number($('#latPos').text());
-			startViewChange.pointLngStart = Number($('#lngPos').text());
-			//console.log(startViewChange);
-		}
-	});
-	
-	google.earth.addEventListener(ge.getView(), 'viewchange', function(){
-		if (mbutton) {
- 			newLat = startViewChange.pointLatStart - (startViewChange.camLatStart - ge.getView().copyAsLookAt(ge.ALTITUDE_ABSOLUTE).getLatitude());
-			newLng = startViewChange.pointLngStart - (startViewChange.camLngStart - ge.getView().copyAsLookAt(ge.ALTITUDE_ABSOLUTE).getLongitude());
-			//console.log(newLat + "," + newLng);
-			dataset.boxColorChange(newLat,newLng);
-		}
-	});
+
+    google.earth.addEventListener(ge.getGlobe(), 'mousemove', function (event) {
+        document.getElementById('latPos').innerHTML = event.getLatitude();
+        //$('#latPos').html(event.getLatitude());
+        document.getElementById('lngPos').innerHTML = event.getLongitude();
+        //$('#lngPos').html(event.getLongitude());
+        if (mbutton && event.getTarget().getType() == 'KmlPlacemark' && event.getTarget().getGeometry().getType() == 'KmlPolygon') {
+            event.preventDefault();
+            dataset.boxColorChange(event.getLatitude(), event.getLongitude());
+        }
+    });
+
+    google.earth.addEventListener(ge.getWindow(), 'mouseup', function (event) {
+        if (mbutton) {
+            mbutton = false;
+            dataset.oldID = -1;
+        }
+    });
+
+    google.earth.addEventListener(ge.getView(), 'viewchangebegin', function () {
+        if (mbutton) {
+            startViewChange.camLatStart = ge.getView().copyAsLookAt(ge.ALTITUDE_ABSOLUTE).getLatitude();
+            startViewChange.camLngStart = ge.getView().copyAsLookAt(ge.ALTITUDE_ABSOLUTE).getLongitude();
+            startViewChange.pointLatStart = Number($('#latPos').text());
+            startViewChange.pointLngStart = Number($('#lngPos').text());
+            //console.log(startViewChange);
+        }
+    });
+
+    google.earth.addEventListener(ge.getView(), 'viewchange', function () {
+        if (mbutton) {
+            newLat = startViewChange.pointLatStart - (startViewChange.camLatStart - ge.getView().copyAsLookAt(ge.ALTITUDE_ABSOLUTE).getLatitude());
+            newLng = startViewChange.pointLngStart - (startViewChange.camLngStart - ge.getView().copyAsLookAt(ge.ALTITUDE_ABSOLUTE).getLongitude());
+            //console.log(newLat + "," + newLng);
+            dataset.boxColorChange(newLat, newLng);
+        }
+    });
 }
 
 function initGrid() {
-	//RemoveAllFeatures();
-	// something like ge.getFeatures().removeChild(grid);
+    //RemoveAllFeatures();
+    // something like ge.getFeatures().removeChild(grid);
 
-	// set the camera view
-	var la = ge.createLookAt('');
-	la.setLatitude(startCoords.LL.lat);
-	la.setLongitude(startCoords.LL.lng);
-	la.setRange(5000);
-	ge.getView().setAbstractView(la);
-	
+    // set the camera view
+    var la = ge.createLookAt('');
+    la.setLatitude(startCoords.LL.lat);
+    la.setLongitude(startCoords.LL.lng);
+    la.setRange(5000);
+    ge.getView().setAbstractView(la);
+
     dataset.createMap();
-	
-	var grid = ge.createFolder("grid");
-	genPolygons(grid);
-// 	for (x = 0; x < dataset.placemarks.length; x++) {
-// 		for (y = 0; y < dataset.placemarks[x].length; y++) {
-// 			grid.getFeatures().appendChild(dataset.placemarks[x][y]);
-// 		}
-// 	}
-	ge.getFeatures().appendChild(grid);
-	
-	innerGrid = ge.createFolder("innerGrid");
-        
+
+    var grid = ge.createFolder("grid");
+    genPolygons(grid);
+    // 	for (x = 0; x < dataset.placemarks.length; x++) {
+    // 		for (y = 0; y < dataset.placemarks[x].length; y++) {
+    // 			grid.getFeatures().appendChild(dataset.placemarks[x][y]);
+    // 		}
+    // 	}
+    ge.getFeatures().appendChild(grid);
+
+    innerGrid = ge.createFolder("innerGrid");
+
     clickInit();
 }
 
 // function genPolygons(folder) {
-	
+
 // 	var id = 0;
-    
+
 //     for (var latI = 0; latI < numLat; latI++) {
 //         makePolygon(0, latI, folder, id);
 // 		id++;
 // 		if (latI === 0 ) {
 // 			dataset.addLat(latI,newCoords.LR.lat);
 // 		}
-        
+
 //         for (var lngI = 1; lngI < numLng; lngI++) {
 //             makePolygon(lngI, latI, folder, id);
 // 			id++;
 // 			LLCorner.X = newCoords.LL.lng;
 //         	LLCorner.Y = newCoords.LL.lat;
-			
+
 //             if (latI === lngI) {
 // 				dataset.addLat(latI,newCoords.LR.lat);
 // 				dataset.addLng(lngI,newCoords.LR.lng);
-				
+
 //             }
 //         }     
 //     }
@@ -414,38 +536,38 @@ function initGrid() {
 // }
 
 function genPolygons(folder) {
-	
-	var id = 0;
-	
+
+    var id = 0;
+
     for (var lngI = 0; lngI < numLng; lngI++) {
         makePolygon(0, lngI, folder, id);
-		id++;
-        dataset.addLng(lngI,newCoords.LR.lng);
-        dataset.addLat(0,newCoords.LR.lat);
-        
+        id++;
+        dataset.addLng(lngI, newCoords.LR.lng);
+        dataset.addLat(0, newCoords.LR.lat);
+
         for (var latI = 1; latI < numLat; latI++) {
             makePolygon(latI, lngI, folder, id);
-			id++;
-			LLCorner.X = newCoords.LL.lng;
-        	LLCorner.Y = newCoords.LL.lat;
+            id++;
+            LLCorner.X = newCoords.LL.lng;
+            LLCorner.Y = newCoords.LL.lat;
             if (lngI === 0) {
-                dataset.addLat(latI,newCoords.LR.lat);
+                dataset.addLat(latI, newCoords.LR.lat);
             }
-        }     
+        }
     }
     dataset.render();
 }
 
 function makePolygon(latI, lngI, folder, id) {
 
-    var placemark = ge.createPlacemark( (id).toString() );
+    var placemark = ge.createPlacemark((id).toString());
     var polygon = ge.createPolygon('');
-	
+
     placemark.setGeometry(polygon);
-    
-//     var lngDiff = startCoords.LL.lng - startCoords.LR.lng;
-//     var latDiff = startCoords.LR.lat - startCoords.UR.lat;
-	
+
+    //     var lngDiff = startCoords.LL.lng - startCoords.LR.lng;
+    //     var latDiff = startCoords.LR.lat - startCoords.UR.lat;
+
     newCoords = {
         LL: {
             lat: startCoords.LL.lat + (latI * -cellSize),
@@ -464,7 +586,7 @@ function makePolygon(latI, lngI, folder, id) {
             lng: startCoords.UL.lng + (lngI * -cellSize)
         }
     };
-    
+
     var innerDiff = cellSize * LINE_WIDTH;
 
     var outer = ge.createLinearRing('');
@@ -483,69 +605,69 @@ function makePolygon(latI, lngI, folder, id) {
 
     if (!placemark.getStyleSelector()) {
         placemark.setStyleSelector(ge.createStyle(''));
-    }    
-	
+    }
+
     placemark.getStyleSelector().getLineStyle().setWidth(3);
     placemark.getStyleSelector().getLineStyle().getColor().set('ffffffff');
     placemark.getStyleSelector().getPolyStyle().setFill(1);
-	
-	folder.getFeatures().appendChild(placemark);
+
+    folder.getFeatures().appendChild(placemark);
 }
 
 function drawInnerLines(folder) {
-	
-	var startLat = startCoords.UR.lat,
-		startLng = startCoords.UR.lng,
-		newLng = 0,
-		newLat = 0;
-	
-	for (var lngI = 0; lngI < numLng; lngI++) {
-		for (var decLngI = 0; decLngI < 1; decLngI += (1/3) )   {
-			newLng = startLng + ( ( decLngI + lngI) * -cellSize );
-			addLine(startLat, newLng, startLat + ( numLng * -cellSize ), newLng, startCoords.UR.alt, folder);
-		}
-	}
-	
-	for (var latI = 0; latI < numLat; latI++) {
-		for (var decLatI = 0; decLatI < 1; decLatI += (1/3) ) {
-			newLat = startLat + ( ( decLatI +latI ) * -cellSize );
-			addLine(newLat, startLng, newLat, startLng  + ( numLat * -cellSize ), startCoords.UR.alt, folder);
-		}
-	}
+
+    var startLat = startCoords.UR.lat,
+        startLng = startCoords.UR.lng,
+        newLng = 0,
+        newLat = 0;
+
+    for (var lngI = 0; lngI < numLng; lngI++) {
+        for (var decLngI = 0; decLngI < 1; decLngI += (1 / 3)) {
+            newLng = startLng + ((decLngI + lngI) * -cellSize);
+            addLine(startLat, newLng, startLat + (numLng * -cellSize), newLng, startCoords.UR.alt, folder);
+        }
+    }
+
+    for (var latI = 0; latI < numLat; latI++) {
+        for (var decLatI = 0; decLatI < 1; decLatI += (1 / 3)) {
+            newLat = startLat + ((decLatI + latI) * -cellSize);
+            addLine(newLat, startLng, newLat, startLng + (numLat * -cellSize), startCoords.UR.alt, folder);
+        }
+    }
 }
 
-function addLine(lat1,lng1,lat2,lng2,alt,folder){
-	// Create the placemark
-	var lineStringPlacemark = ge.createPlacemark('');
-	
-	// Create the LineString
-	var lineString = ge.createLineString('');
-	lineStringPlacemark.setGeometry(lineString);
-	
-	// Create a style and set width and color of line
-	lineStringPlacemark.setStyleSelector(ge.createStyle(''));
-	var lineStyle = lineStringPlacemark.getStyleSelector().getLineStyle();
-	lineStyle.setWidth(5);
-	lineStyle.getColor().set('99CCCCCC');  // aabbggrr format
+function addLine(lat1, lng1, lat2, lng2, alt, folder) {
+    // Create the placemark
+    var lineStringPlacemark = ge.createPlacemark('');
 
-	
-	// Add LineString points
-	lineString.getCoordinates().pushLatLngAlt(lat1, lng1, alt);
-	lineString.getCoordinates().pushLatLngAlt(lat2, lng2, alt);
-	
-	// Add the feature to Earth
-	folder.getFeatures().appendChild(lineStringPlacemark);
+    // Create the LineString
+    var lineString = ge.createLineString('');
+    lineStringPlacemark.setGeometry(lineString);
+
+    // Create a style and set width and color of line
+    lineStringPlacemark.setStyleSelector(ge.createStyle(''));
+    var lineStyle = lineStringPlacemark.getStyleSelector().getLineStyle();
+    lineStyle.setWidth(5);
+    lineStyle.getColor().set('99CCCCCC'); // aabbggrr format
+
+
+    // Add LineString points
+    lineString.getCoordinates().pushLatLngAlt(lat1, lng1, alt);
+    lineString.getCoordinates().pushLatLngAlt(lat2, lng2, alt);
+
+    // Add the feature to Earth
+    folder.getFeatures().appendChild(lineStringPlacemark);
 }
 
 //--CONTROLS----------------------------------
 
-document.addEventListener('DOMContentLoaded',function(){
-		
+document.addEventListener('DOMContentLoaded', function () {
+
     google.setOnLoadCallback(init);
 
-	document.getElementById('drawMap').addEventListener('click', function() {
+    document.getElementById('drawMap').addEventListener('click', function () {
         cellSize = Number(document.getElementById('cellSize').value);
-        
+
         startCoords = {
             UL: {
                 lat: Number(document.getElementById('startURLat').value),
@@ -567,78 +689,54 @@ document.addEventListener('DOMContentLoaded',function(){
                 lng: Number(document.getElementById('startURLng').value),
                 alt: Number(document.getElementById('startAlt').value)
             }
-        };	
-        
+        };
+
         numLng = Number(document.getElementById('numLng').value);
         numLat = Number(document.getElementById('numLat').value);
-		noData.val = Number(document.getElementById('nodata').value);
-		        
-        initGrid();
-		
-	});
-	
-	//console.log( document.getElementsByClassName('updateOptions') );
-	var upOpts = document.getElementsByClassName('updateOptions');
-	
-	for (var i = 0; i < upOpts.length; ++i) {
-		
-		upOpts[i].addEventListener('click', function(e) {
-			
-			var options = ge.getOptions();
-			options.setStatusBarVisibility( document.getElementById('#statusbar').checked );
-			options.setGridVisibility( document.getElementById('LL').checked );
-			options.setOverviewMapVisibility( document.getElementById('overview').checked );
-			options.setScaleLegendVisibility( document.getElementById('scaleLegend').checked );
-		
-			if ( document.getElementById('nav').checked ) {
-				ge.getNavigationControl().setVisibility(ge.VISIBILITY_SHOW);
-			} else {
-				ge.getNavigationControl().setVisibility(ge.VISIBILITY_HIDE);
-			}
-			
-			noData.checked = document.getElementById('nodata-box').checked;
-		});
-	}
+        noData.val = Number(document.getElementById('nodata').value);
 
-	document.getElementById('guideGrid').addEventListener('click', function(){
-		
-		
-		if ( this.checked ) {
-			
-			
-			drawInnerLines(innerGrid);
-			//console.log( innerGrid.getKml() );
-			ge.getFeatures().appendChild(innerGrid);
-			
-		} else {
-			ge.getFeatures().removeChild(innerGrid);
-		}
-	});
-	
-	document.getElementById('download').addEventListener('click', function(){
-		filesys.download( document.getElementById('filename').value + ".txt", document.getElementById('output').value );
-	});
-	
-	document.getElementById('downloadKML').addEventListener('click', function(){
-		filesys.saveTempAndDL( "data.kml", ge.getElementById('grid').getKml() );// $('#filename').val() + ".kml", ge.getFeatures().getFirstChild().getKml() );
-		//console.log(ge.getFeatures().getFirstChild().getKml());
-		
-// 		ge.getFeatures().getFirstChild().getKml().toBlob(function(blob) {
-// 			saveAs(blob, $('#filename').val() + ".kml");
-// 		});
-		
-// 		var kml = "";
-// 		for (var iLat  = 0; iLat < numLat; iLat++) {
-//              for (var iLng = numLng-1; iLng >= 0; iLng--) {
-//                  if (iLng != numLng-1) {
-//                      kml += ' ';
-//                  }
-//                  kml += dataset.placemarks[iLat][iLng].getKml();
-//              }
-//              kml += '\n';
-//          } 
-		 
-		// for (var i = 0; i < ge.getFeatures().getChildNodes().getLength(); i++ )
-		//	console.log( ge.getFeatures().getFirstChild().getKml() );
-	});
+        initGrid();
+
+    });
+
+    var upOpts = document.getElementsByClassName('updateOptions');
+
+    for (var i = 0; i < upOpts.length; ++i) {
+
+        upOpts[i].addEventListener('click', function (e) {
+
+            var options = ge.getOptions();
+            options.setStatusBarVisibility(document.getElementById('#statusbar').checked);
+            options.setGridVisibility(document.getElementById('LL').checked);
+            options.setOverviewMapVisibility(document.getElementById('overview').checked);
+            options.setScaleLegendVisibility(document.getElementById('scaleLegend').checked);
+
+            if (document.getElementById('nav').checked) {
+                ge.getNavigationControl().setVisibility(ge.VISIBILITY_SHOW);
+            } else {
+                ge.getNavigationControl().setVisibility(ge.VISIBILITY_HIDE);
+            }
+
+            noData.checked = document.getElementById('nodata-box').checked;
+        });
+    }
+
+    document.getElementById('guideGrid').addEventListener('click', function () {
+
+        if (this.checked) {
+            drawInnerLines(innerGrid);
+            ge.getFeatures().appendChild(innerGrid);
+        } else {
+            ge.getFeatures().removeChild(innerGrid);
+        }
+    });
+
+    document.getElementById('download').addEventListener('click', function () {
+        filesys.download(document.getElementById('filename').value + ".txt", document.getElementById('output').value);
+    });
+
+    document.getElementById('downloadKML').addEventListener('click', function () {
+        filesys.download(document.getElementById('filename').value + ".kml", ge.getElementById('grid').getKml()); // $('#filename').val() + ".kml", ge.getFeatures().getFirstChild().getKml() );
+    });
+    document.getElementById('files').addEventListener('change', filesys.uploadRaster, false);
 });
