@@ -3,6 +3,7 @@
 Andrew Stanish 
 2014
 andybp85 at gmail
+Source maintained at https://github.com/andybp85/GERasterCreator/
 
 This file is part of GE Raster Creator. 
 
@@ -203,7 +204,40 @@ var filesys = {
                         }
                         i++;
                     }
+                    // console.log ( i )
+                    var head = i + 1,
+                        row = 0,    
+                        col = 0,
+                        ids = [];
+                    
                     fireEvent(document.getElementById('drawMap'), 'click');
+                    
+                    while (row < numLat) {
+                        col = 0
+                        while (col < numLng) {
+                            ids.push(( ( numLng - col ) * numLat ) - ( numLat - row ));
+                            col++;
+                        }
+                        row++;
+                    }                    
+                    
+                    mbutton = true;
+                    
+                    for (var i = 0; i < ids.length; i++){
+                        if ( raster[head+i] == 1 ) {
+                            console.log(i, Math.floor(i / numLng), numLng - (i % numLng) );
+                            
+                            elem = dataset.getBox(startCoords.UR.lat + (( Math.floor(i / numLng) +1) * -cellSize ), startCoords.UR.lng + ( ((numLng - (i % numLng))-1) * -cellSize ) );
+                            console.log( elem, ids[i].toString() );
+                            dataset.bCC(elem.latI, elem.lngI, ids[i].toString() );
+
+//                             elem = ge.getElementById( ids[i].toString() ) ;
+//                             console.log( elem.getKml() );
+//                             console.log( elem.getGeometry() );
+                        }
+                    }
+                    mbutton = false;
+                    alert('File Loaded');
                 };
 
             })(f);
@@ -364,7 +398,7 @@ var dataset = {
                 //data += ((Number(iLng) * numLat ) + Number(iLat)).toString() + ':' + this.grid[iLat][iLng];
                 data += this.grid[iLat][iLng];
             }
-            data += ' ';
+            data += ' \n';
         }
         document.getElementById('output').innerHTML = data;
     },
@@ -390,36 +424,39 @@ var dataset = {
         };
     },
 
-    boxColorChange: function (lat, lng) {
+    boxColorChange : function (lat, lng) {
         if (mbutton) {
 
             var LL = dataset.getBox(lat, lng);
 
             var id = ( (Number(LL.lngI) * numLat ) + Number(LL.latI) ).toString() ;
 			
-            var placemarkStyle = ge.getElementById(id).getStyleSelector();
-            if (this.oldID != id) {
-                
-               //console.log(LL, id );//, ge.getElementById(id).getKml() );
-				
-                if (noData.checked) {
-                    this.grid[LL.latI][LL.lngI] = noData.val;
-                    placemarkStyle.getLineStyle().getColor().set('ffae33ff');
-                    placemarkStyle.getPolyStyle().getColor().set('ffae33ff');
-                } else if (placemarkStyle.getPolyStyle().getColor().get() == "ff00008b" || placemarkStyle.getPolyStyle().getColor().get() == 'ffae33ff') {
-                    this.grid[LL.latI][LL.lngI] = 0;
-                    placemarkStyle.getLineStyle().getColor().set('ffffffff');
-                    placemarkStyle.getPolyStyle().getColor().set('ffffffff');
-                } else {
-                    this.grid[LL.latI][LL.lngI] = 1;
-                    placemarkStyle.getLineStyle().getColor().set('ff00008b');
-                    placemarkStyle.getPolyStyle().getColor().set('ff00008b');
-                }
-
-                this.render();
-
-                this.oldID = parseInt(id);
+            this.bCC(LL.latI, LL.lngI, id);
+        }
+    },
+    bCC : function(latI, lngI, id) {
+        var placemarkStyle = ge.getElementById(id).getStyleSelector();
+        if (this.oldID != id) {
+            
+           //console.log(LL, id );//, ge.getElementById(id).getKml() );
+            
+            if (noData.checked) {
+                this.grid[latI][lngI] = noData.val;
+                placemarkStyle.getLineStyle().getColor().set('ffae33ff');
+                placemarkStyle.getPolyStyle().getColor().set('ffae33ff');
+            } else if (placemarkStyle.getPolyStyle().getColor().get() == "ff00008b" || placemarkStyle.getPolyStyle().getColor().get() == 'ffae33ff') {
+                this.grid[latI][lngI] = 0;
+                placemarkStyle.getLineStyle().getColor().set('ffffffff');
+                placemarkStyle.getPolyStyle().getColor().set('ffffffff');
+            } else {
+                this.grid[latI][lngI] = 1;
+                placemarkStyle.getLineStyle().getColor().set('ff00008b');
+                placemarkStyle.getPolyStyle().getColor().set('ff00008b');
             }
+            
+            this.render();
+
+            this.oldID = parseInt(id);
         }
     }
 };
