@@ -746,7 +746,7 @@ document.addEventListener('DOMContentLoaded', function () {
         upOpts[i].addEventListener('click', function (e) {
 
             var options = ge.getOptions();
-            options.setStatusBarVisibility(document.getElementById('#statusbar').checked);
+            options.setStatusBarVisibility(document.getElementById('statusbar').checked);
             options.setGridVisibility(document.getElementById('LL').checked);
             options.setOverviewMapVisibility(document.getElementById('overview').checked);
             options.setScaleLegendVisibility(document.getElementById('scaleLegend').checked);
