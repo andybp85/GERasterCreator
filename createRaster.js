@@ -398,7 +398,7 @@ var dataset = {
                 //data += ((Number(iLng) * numLat ) + Number(iLat)).toString() + ':' + this.grid[iLat][iLng];
                 data += this.grid[iLat][iLng];
             }
-            data += ' \n';
+            data += ' ';
         }
         document.getElementById('output').innerHTML = data;
     },
