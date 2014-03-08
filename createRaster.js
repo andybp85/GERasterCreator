@@ -154,13 +154,7 @@ var filesys = {
     uploadRaster: function (evt) {
         var files = evt.target.files; // FileList object
 
-        // Loop through the FileList and render image files as thumbnails.
         for (var i = 0, f; f = files[i]; i++) {
-
-            // Only process image files.
-            //	      if (!f.type.match('image.*')) {
-            //	        continue;
-            //	      }
 
             var reader = new FileReader();
 
@@ -247,14 +241,44 @@ var filesys = {
                     mbutton = false;
                     alert('File Loaded');
                 };
+                
 
             })(f);
 
-            // Read in the image file as a data URL.
+            // Read in the  file as a text string.
             reader.readAsText(f);
         }
     },
+    uploadKML: function(evt) {
+        var files = evt.target.files; // FileList object
+
+        for (var i = 0, f; f = files[i]; i++) {
+        	
+        	var reader = new FileReader();
+
+            // Closure to capture the file information.
+            reader.onload = (function (theFile) {
+                return function (e) {
+                	console.log( theFile );
+                    filesys.upfile = e.target.result;
+                    var kmlObject = ge.parseKml(filesys.upfile);
+                    
+                    ge.getFeatures().appendChild(kmlObject);
+                    
+                    alert('File Loaded');
+                };
+
+            })(f);
+
+            // Read in the image file as a string.
+            reader.readAsText(f);
+	  		
+        }
+    }
+
 };
+
+
 //	init : function() {
 //		window.webkitStorageInfo.requestQuota(PERSISTENT, 1024*1024, function(grantedBytes) {
 //			window.requestFileSystem(window.PERSISTENT, grantedBytes, function(fs){
@@ -788,5 +812,6 @@ document.addEventListener('DOMContentLoaded', function () {
         filesys.download(document.getElementById('filename').value + ".kml", ge.getElementById('grid').getKml()); // $('#filename').val() + ".kml", ge.getFeatures().getFirstChild().getKml() );
     });
     document.getElementById('files').addEventListener('change', filesys.uploadRaster, false);
+    document.getElementById('kml_files').addEventListener('change', filesys.uploadKML, false);
     
 });
