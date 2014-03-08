@@ -225,7 +225,7 @@ var filesys = {
                     
                     for (var i = 0; i < ids.length; i++){
                         if ( raster[head+i] == 1 ) {
-                            console.log(i, Math.floor(i / numLng), numLng - (i % numLng) );
+//                            console.log(i, Math.floor(i / numLng), numLng - (i % numLng) );
                             
                             elem = dataset.getBox(startCoords.UR.lat + (( Math.floor(i / numLng) +1) * -cellSize ), startCoords.UR.lng + ( ((numLng - (i % numLng))-1) * -cellSize ) );
                             console.log( elem, ids[i].toString() );
@@ -234,7 +234,15 @@ var filesys = {
 //                             elem = ge.getElementById( ids[i].toString() ) ;
 //                             console.log( elem.getKml() );
 //                             console.log( elem.getGeometry() );
-                        }
+                        } else if ( raster[head+i] == -999 ){
+                        	
+                        	noData.checked = true;
+                        	elem = dataset.getBox(startCoords.UR.lat + (( Math.floor(i / numLng) +1) * -cellSize ), startCoords.UR.lng + ( ((numLng - (i % numLng))-1) * -cellSize ) );
+                            console.log( elem, ids[i].toString() );
+                            dataset.bCC(elem.latI, elem.lngI, ids[i].toString() );
+                            noData.checked = false;
+                            
+                        } 
                     }
                     mbutton = false;
                     alert('File Loaded');
@@ -780,4 +788,5 @@ document.addEventListener('DOMContentLoaded', function () {
         filesys.download(document.getElementById('filename').value + ".kml", ge.getElementById('grid').getKml()); // $('#filename').val() + ".kml", ge.getFeatures().getFirstChild().getKml() );
     });
     document.getElementById('files').addEventListener('change', filesys.uploadRaster, false);
+    
 });
