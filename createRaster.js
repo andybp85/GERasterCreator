@@ -207,23 +207,42 @@ var filesys = {
                     fireEvent(document.getElementById('drawMap'), 'click');
                     
                     while (row < numLat) {
-                        col = 0
+                        col = 0;
                         while (col < numLng) {
                             ids.push(( ( numLng - col ) * numLat ) - ( numLat - row ));
                             col++;
                         }
                         row++;
                     }                    
-                    
+                    1
                     mbutton = true;
                     
+                    var logger = [];
+                    
                     for (var i = 0; i < ids.length; i++){
+                        
+                        var boxOuterGeom = ge.getElementById(ids[i].toString()).getGeometry().getOuterBoundary().getCoordinates().get(0);
+                        var boxInnerGeom = ge.getElementById(ids[i].toString()).getGeometry().getInnerBoundaries().getFirstChild().getCoordinates().get(0);
+                        
+                        var insideBox = {
+                        		lat: (boxOuterGeom.getLatitude() + boxInnerGeom.getLatitude()) / 2,
+                        		lng: (boxOuterGeom.getLongitude() + boxInnerGeom.getLongitude()) / 2
+                        }
+                        
+//                        var logplacemark = ge.createPlacemark(''); 
+//                        var point = ge.createPoint('');
+//                        point.setLatitude(insideBox.lat);
+//                        point.setLongitude(insideBox.lng);
+//                        logplacemark.setGeometry(point);
+//                        ge.getFeatures().appendChild(logplacemark);
+                        
+//                    	  console.log(i, Math.floor(i / numLng), numLng - (i % numLng) );
                         if ( raster[head+i] == 1 ) {
 //                            console.log(i, Math.floor(i / numLng), numLng - (i % numLng) );
                             
-                            elem = dataset.getBox(startCoords.UR.lat + (( Math.floor(i / numLng) +1) * -cellSize ), startCoords.UR.lng + ( ((numLng - (i % numLng))-1) * -cellSize ) );
-                            console.log( elem, ids[i].toString() );
-                            dataset.bCC(elem.latI, elem.lngI, ids[i].toString() );
+                            elem = dataset.getBox(insideBox.lat, insideBox.lng );
+                            // console.log( elem.latI, elem.lngI );
+                            dataset.bCC(elem.latI, elem.lngI, ids[i].toString(), true );
 
 //                             elem = ge.getElementById( ids[i].toString() ) ;
 //                             console.log( elem.getKml() );
@@ -231,14 +250,18 @@ var filesys = {
                         } else if ( raster[head+i] == -999 ){
                         	
                         	noData.checked = true;
-                        	elem = dataset.getBox(startCoords.UR.lat + (( Math.floor(i / numLng) +1) * -cellSize ), startCoords.UR.lng + ( ((numLng - (i % numLng))-1) * -cellSize ) );
-                            console.log( elem, ids[i].toString() );
-                            dataset.bCC(elem.latI, elem.lngI, ids[i].toString() );
+                        	elem = dataset.getBox(insideBox.lat, insideBox.lng );
+                            // console.log( elem.latI, elem.lngI );
+                            dataset.bCC(elem.latI, elem.lngI, ids[i].toString(), true );
                             noData.checked = false;
                             
-                        } 
+                        } else {
+                        	//console.log(logElem.latI + "," + logElem.lngI, ", " + ids[i].toString() + ": no change");
+                        }
                     }
                     mbutton = false;
+                    dataset.render();
+                    document.getElementById("log").innerHTML = String(logger);
                     alert('File Loaded');
                 };
                 
@@ -428,6 +451,7 @@ var dataset = {
                     data += ' ';
                 }
                 //data += ((Number(iLng) * numLat ) + Number(iLat)).toString() + ':' + this.grid[iLat][iLng];
+                //console.log(iLat,iLng, this.grid[iLat][iLng]);
                 data += this.grid[iLat][iLng];
             }
             data += ' ';
@@ -466,30 +490,35 @@ var dataset = {
             this.bCC(LL.latI, LL.lngI, id);
         }
     },
-    bCC : function(latI, lngI, id) {
+    bCC : function(latI, lngI, id, fastMode) {
+    	
         var placemarkStyle = ge.getElementById(id).getStyleSelector();
-        if (this.oldID != id) {
+        if (this.oldID != id || fastMode) {
             
            //console.log(LL, id );//, ge.getElementById(id).getKml() );
-            
+           var retval = 0;
             if (noData.checked) {
+            	retval = 1;
                 this.grid[latI][lngI] = noData.val;
                 placemarkStyle.getLineStyle().getColor().set('ffae33ff');
                 placemarkStyle.getPolyStyle().getColor().set('ffae33ff');
             } else if (placemarkStyle.getPolyStyle().getColor().get() == "ff00008b" || placemarkStyle.getPolyStyle().getColor().get() == 'ffae33ff') {
+            	retval = 2;
                 this.grid[latI][lngI] = 0;
                 placemarkStyle.getLineStyle().getColor().set('ffffffff');
                 placemarkStyle.getPolyStyle().getColor().set('ffffffff');
             } else {
+            	retval = 3;
                 this.grid[latI][lngI] = 1;
                 placemarkStyle.getLineStyle().getColor().set('ff00008b');
                 placemarkStyle.getPolyStyle().getColor().set('ff00008b');
             }
             
-            this.render();
+            if (! fastMode) this.render();
 
             this.oldID = parseInt(id);
         }
+        ///console.log( latI, lngI, id, this.grid[latI][lngI], retval);
     }
 };
 
