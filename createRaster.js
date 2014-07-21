@@ -165,6 +165,7 @@ var filesys = {
                     filesys.upfile = e.target.result;
                     var raster = filesys.upfile.split(/\s+/);
                     var i = 0;
+                    // capture header information
                     while (isNaN(raster[i]) || isNaN(raster[i + 1])) {
                         switch (raster[i]) {
                         case 'NCOLS':
@@ -198,13 +199,16 @@ var filesys = {
                         i++;
                     }
                     
+                    //get ready to parse
                     var head = i + 1,
                         row = 0,    
                         col = 0,
                         ids = [];
                     
+                    //draw a blank map
                     fireEvent(document.getElementById('drawMap'), 'click');
                     
+                    //map out ids
                     while (row < numLat) {
                         col = 0;
                         while (col < numLng) {
@@ -214,6 +218,7 @@ var filesys = {
                         row++;
                     }                    
                     
+                    // parse raster, click on cells 
                     mbutton = true;
                     
                     for (var i = 0; i < ids.length; i++){
@@ -241,12 +246,10 @@ var filesys = {
                         }
                     }
                     mbutton = false;
+                    
                     dataset.render();
-                    document.getElementById("log").innerHTML = String(logger);
                     alert('File Loaded');
                 };
-                
-
             })(f);
 
             // Read in the  file as a text string.
