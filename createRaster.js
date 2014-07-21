@@ -3,6 +3,7 @@
 Andrew Stanish 
 2014
 andybp85 at gmail
+Version 2.0.3.1
 Source maintained at https://github.com/andybp85/GERasterCreator/
 
 This file is part of GE Raster Creator. 
