@@ -164,7 +164,6 @@ var filesys = {
                 return function (e) {
                     filesys.upfile = e.target.result;
                     var raster = filesys.upfile.split(/\s+/);
-                    //document.getElementById('output').value = filesys.upfile;
                     var i = 0;
                     while (isNaN(raster[i]) || isNaN(raster[i + 1])) {
                         switch (raster[i]) {
@@ -193,13 +192,12 @@ var filesys = {
                             document.getElementById('startURLng').value = (Number(raster[i + 1]) + (numLng * cellSize));
                             break;
                         case 'YLLCORNER':
-                            //console.log(raster[i + 1], numLat, cellSize, Number(raster[i + 1]) + (numLat * cellSize));
                             document.getElementById('startURLat').value = (Number(raster[i + 1]) + (numLat * cellSize));
                             break;
                         }
                         i++;
                     }
-                    // console.log ( i )
+                    
                     var head = i + 1,
                         row = 0,    
                         col = 0,
@@ -215,10 +213,8 @@ var filesys = {
                         }
                         row++;
                     }                    
-                    1
-                    mbutton = true;
                     
-                    var logger = [];
+                    mbutton = true;
                     
                     for (var i = 0; i < ids.length; i++){
                         
@@ -228,36 +224,20 @@ var filesys = {
                         var insideBox = {
                         		lat: (boxOuterGeom.getLatitude() + boxInnerGeom.getLatitude()) / 2,
                         		lng: (boxOuterGeom.getLongitude() + boxInnerGeom.getLongitude()) / 2
-                        }
-                        
-//                        var logplacemark = ge.createPlacemark(''); 
-//                        var point = ge.createPoint('');
-//                        point.setLatitude(insideBox.lat);
-//                        point.setLongitude(insideBox.lng);
-//                        logplacemark.setGeometry(point);
-//                        ge.getFeatures().appendChild(logplacemark);
-                        
-//                    	  console.log(i, Math.floor(i / numLng), numLng - (i % numLng) );
+                        };
+
                         if ( raster[head+i] == 1 ) {
-//                            console.log(i, Math.floor(i / numLng), numLng - (i % numLng) );
                             
                             elem = dataset.getBox(insideBox.lat, insideBox.lng );
-                            // console.log( elem.latI, elem.lngI );
                             dataset.bCC(elem.latI, elem.lngI, ids[i].toString(), true );
 
-//                             elem = ge.getElementById( ids[i].toString() ) ;
-//                             console.log( elem.getKml() );
-//                             console.log( elem.getGeometry() );
                         } else if ( raster[head+i] == -999 ){
                         	
                         	noData.checked = true;
                         	elem = dataset.getBox(insideBox.lat, insideBox.lng );
-                            // console.log( elem.latI, elem.lngI );
                             dataset.bCC(elem.latI, elem.lngI, ids[i].toString(), true );
                             noData.checked = false;
                             
-                        } else {
-                        	//console.log(logElem.latI + "," + logElem.lngI, ", " + ids[i].toString() + ": no change");
                         }
                     }
                     mbutton = false;
@@ -607,33 +587,6 @@ function initGrid() {
     clickInit();
 }
 
-// function genPolygons(folder) {
-
-// 	var id = 0;
-
-//     for (var latI = 0; latI < numLat; latI++) {
-//         makePolygon(0, latI, folder, id);
-// 		id++;
-// 		if (latI === 0 ) {
-// 			dataset.addLat(latI,newCoords.LR.lat);
-// 		}
-
-//         for (var lngI = 1; lngI < numLng; lngI++) {
-//             makePolygon(lngI, latI, folder, id);
-// 			id++;
-// 			LLCorner.X = newCoords.LL.lng;
-//         	LLCorner.Y = newCoords.LL.lat;
-
-//             if (latI === lngI) {
-// 				dataset.addLat(latI,newCoords.LR.lat);
-// 				dataset.addLng(lngI,newCoords.LR.lng);
-
-//             }
-//         }     
-//     }
-//     dataset.render();
-// }
-
 function genPolygons(folder) {
 
     var id = 0;
@@ -663,9 +616,6 @@ function makePolygon(latI, lngI, folder, id) {
     var polygon = ge.createPolygon('');
 
     placemark.setGeometry(polygon);
-
-    //     var lngDiff = startCoords.LL.lng - startCoords.LR.lng;
-    //     var latDiff = startCoords.LR.lat - startCoords.UR.lat;
 
     newCoords = {
         LL: {
@@ -720,7 +670,6 @@ function drawInnerLines(folder) {
         newLng = 0,
         newLat = 0,
         gridPcnt = 3;
-        //gridPcnt = document.getElementById('guideGridSize').value;
 
     for (var lngI = 0; lngI < numLng; lngI++) {
         for (var decLngI = 0; decLngI < 1; decLngI += (1 / gridPcnt)) {
