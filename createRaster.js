@@ -23,8 +23,9 @@ along with GE Raster Creator.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-I) Utility Functions
-  A) fireEvent Function
+I) Utility Methods
+  A) add method
+  B) fire event 
 
 II) GEGrids Object
 
@@ -89,26 +90,159 @@ II) GEGrids Object
       d) uploadASCII Function
      
   D) Event Triggers
-*/
+  	Delegation
+ */
 
-// UTILITY FUNCTIONS ----------------------------------
-function fireEvent(obj, evt) {
-    var fireOnThis = obj;
-    if (document.createEvent) {
-        var evObj = document.createEvent('MouseEvents');
-        evObj.initEvent(evt, true, false);
-        fireOnThis.dispatchEvent(evObj);
-    } else if (document.createEventObject) { //IE
-        var evObj = document.createEventObject();
-        fireOnThis.fireEvent('on' + evt, evObj);
-    }
-}
+/*jslint browser: true, unparam: true, white: true */
+
+// UTILITY METHODS ----------------------------------
+Object.prototype.method = function (name, func) {
+	"use strict";
+    this.prototype[name] = func;
+    return this;
+};
  
+HTMLElement.method('fire', function(evt) {
+	"use strict";
+	var fireOnThis = this, evObj;
+	if (document.createEvent) {
+		evObj = document.createEvent('MouseEvents');
+		evObj.initEvent(evt, true, false);
+		fireOnThis.dispatchEvent(evObj);
+	} else if (document.createEventObject) { // IE
+		evObj = document.createEventObject();
+		fireOnThis.fireEvent('on' + evt, evObj);
+	}
+});
+
+//function fireEvent(obj, evt) {
+//	"use strict";
+//	var fireOnThis = obj, evObj;
+//	if (document.createEvent) {
+//		evObj = document.createEvent('MouseEvents');
+//		evObj.initEvent(evt, true, false);
+//		fireOnThis.dispatchEvent(evObj);
+//	} else if (document.createEventObject) { // IE
+//		evObj = document.createEventObject();
+//		fireOnThis.fireEvent('on' + evt, evObj);
+//	}
+//}
+
+
+
 // GEGrids Namespace ----------------------------------
 var GEGrids = (function() {
-   var private_var;
+	"use strict";
 
-   function private_function() {
-     //code
-   }
-})()
+	/* Controls Closure
+	 * Interface for the user to set the option of Google Earth, the parameters of the grid being drawn and 
+	 * the ASCII output, and handles updating the position display.
+	 */
+	var controls = (function() {
+		
+		var options = {},
+			grid_params = {},
+			nodata = {};		
+		
+	        return {		
+				setOptions : function() {
+					options.status_bar = document.getElementById('statusbar').checked;
+					options.nav_control = document.getElementById('nav').checked;
+					options.lat_lng_grid = document.getElementById('LL').checked;
+					options.overview_map = document.getElementById('overview').checked;
+					options.scale_legend = document.getElementById('scaleLegend').checked;
+					options.guide_grids = document.getElementById('guideGrid').checked;
+				},
+				getOptions : function() {
+				    return options;	
+				},
+				setGridParams : function() {
+					grid_params.UR_lat = Number(document.getElementById('startURLat').value);
+					grid_params.UR_lng = Number(document.getElementById('startURLng').value);
+					grid_params.cell_size = Number(document.getElementById('cellSize').value);
+					grid_params.altitude = Number(document.getElementById('startAlt').value);
+					grid_params.num_lat_cells = Number(document.getElementById('numLat').value);
+					grid_params.num_lng_cells = Number(document.getElementById('numLng').value);
+				},
+				getGridParams : function() {
+					return grid_params;
+				},
+				setNodata : function() {
+		        	nodata.checked = document.getElementById('nodata-box').checked;
+		            nodata.value = Number(document.getElementById('nodata').value);
+		        },
+				nodataChecked : function() {
+					return nodata.checked;
+				},
+				nodataValue : function() {
+					return nodata.value;
+				},
+		        updatePosition : function(lat, lng) {
+					document.getElementById('latPos').innerHTML = lat;
+					document.getElementById('lngPos').innerHTML = lng;
+				}
+	        };
+
+	}()),
+	
+	/* googleEarth Closure
+	 * Initializes Google Earth and provides an interface for the rest of the program to interact with elements
+	 * on the map.
+	 */
+	googleEarth = (function() {
+		
+		var ge = null,
+			grid = {};
+		
+		// Initialize Google Earth
+		google.load("earth", "1");
+		
+		function initCallback(instance) {
+		    ge = instance;
+		    ge.getWindow().setVisibility(true);
+	
+		    // add some layers
+		    ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
+		    ge.getLayerRoot().enableLayerById(ge.LAYER_ROADS, true);
+		    ge.getLayerRoot().enableLayerById(ge.LAYER_TERRAIN, true);
+		    ge.getLayerRoot().enableLayerById(ge.LAYER_TREES, true);
+		    ge.getOptions().setStatusBarVisibility(true);
+	
+		    document.getElementById('installed-plugin-version').innerHTML = ge.getPluginVersion().toString();
+		}
+	
+		function failureCallback(errorCode) {
+		    document.getElementById('map3d').innerHTM = errorCode;
+		}
+		
+		function init() {
+		    google.earth.createInstance('map3d', initCallback, failureCallback);
+		}
+		
+		document.addEventListener('DOMContentLoaded', function () {
+		    google.setOnLoadCallback(init);
+		});
+		
+		return {
+			updateOptions : function() {
+				
+			}
+		};
+//		 B) Google Earth Closure
+//
+//		    1) Data
+//		      a) Grid Object
+//		        1. ID String
+//		          a. color String
+//		          b. value Int
+//
+//		    2) Interface
+//			  a) updateOptions Function
+//		      a) makeGrid Function
+//		      b) clearGrid Function
+//		      c) changeValue(ID) Function
+//		      d) downloadKML Function
+		
+	}());
+	
+}());

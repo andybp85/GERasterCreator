@@ -27,8 +27,6 @@ along with GE Raster Creator.  If not, see <http://www.gnu.org/licenses/>.
 <head>
 
   <title>Create Raster Dataset</title>  
-  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-  <script type="text/javascript" src="createRaster.js"></script>
   <style type="text/css">
   /*<![CDATA[*/
       body {
@@ -162,10 +160,13 @@ along with GE Raster Creator.  If not, see <http://www.gnu.org/licenses/>.
     Installed Plugin Version: <span id="installed-plugin-version" style=
     "font-weight: bold;">Loading...</span>
   </div>
-  <input type="button" id="downloadKML" value="Download kml" /><input type="button" id="download" value="Download raster dataset" /><label for="filename">filename: </label><input type="text" id="filename" value="dataset" />
+  <input type="button" id="downloadKML" value="Download kml" /><input type="button" id="download" value="Download ASCII raster" /><label for="filename">filename: </label><input type="text" id="filename" value="dataset" />
   <br />
   
   <textarea rows="50" cols="150" id="output"></textarea>
+  
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  <script type="text/javascript" src="createRaster.js"></script>
 </body>
 </html>
 
