@@ -90,7 +90,7 @@ II) GEGrids Object
       d) uploadASCII Function
      
   D) Event Triggers
-  	Delegation
+    Delegation
  */
 
 /*jslint browser: true, unparam: true, white: true */
@@ -115,18 +115,18 @@ HTMLElement.method('fire', function(evt) {
 	}
 });
 
-//function fireEvent(obj, evt) {
-//	"use strict";
-//	var fireOnThis = obj, evObj;
-//	if (document.createEvent) {
-//		evObj = document.createEvent('MouseEvents');
-//		evObj.initEvent(evt, true, false);
-//		fireOnThis.dispatchEvent(evObj);
-//	} else if (document.createEventObject) { // IE
-//		evObj = document.createEventObject();
-//		fireOnThis.fireEvent('on' + evt, evObj);
-//	}
-//}
+// function fireEvent(obj, evt) {
+// "use strict";
+// var fireOnThis = obj, evObj;
+// if (document.createEvent) {
+// evObj = document.createEvent('MouseEvents');
+// evObj.initEvent(evt, true, false);
+// fireOnThis.dispatchEvent(evObj);
+// } else if (document.createEventObject) { // IE
+// evObj = document.createEventObject();
+// fireOnThis.fireEvent('on' + evt, evObj);
+// }
+// }
 
 
 
@@ -134,9 +134,10 @@ HTMLElement.method('fire', function(evt) {
 var GEGrids = (function() {
 	"use strict";
 
-	/* Controls Closure
-	 * Interface for the user to set the option of Google Earth, the parameters of the grid being drawn and 
-	 * the ASCII output, and handles updating the position display.
+	/*
+	 * Controls Closure Interface for the user to set the option of Google
+	 * Earth, the parameters of the grid being drawn and the ASCII output, and
+	 * handles updating the position display.
 	 */
 	var controls = (function() {
 		
@@ -145,13 +146,8 @@ var GEGrids = (function() {
 			nodata = {};		
 		
 	        return {		
-				setOptions : function() {
-					options.status_bar = document.getElementById('statusbar').checked;
-					options.nav_control = document.getElementById('nav').checked;
-					options.lat_lng_grid = document.getElementById('LL').checked;
-					options.overview_map = document.getElementById('overview').checked;
-					options.scale_legend = document.getElementById('scaleLegend').checked;
-					options.guide_grids = document.getElementById('guideGrid').checked;
+				setOptions : function(opts) {
+					options = opts;
 				},
 				getOptions : function() {
 				    return options;	
@@ -185,20 +181,23 @@ var GEGrids = (function() {
 
 	}()),
 	
-	/* googleEarth Closure
-	 * Initializes Google Earth and provides an interface for the rest of the program to interact with elements
-	 * on the map.
+	/*
+	 * googleEarth Closure Initializes Google Earth and provides an easier
+	 * interface for the rest of the program to interact with elements on the
+	 * map.
 	 */
 	googleEarth = (function() {
 		
-		var ge = null,
+		var ge, ge_options, ge_navigation,
 			grid = {};
 		
-		// Initialize Google Earth
+		// START: Initialize Google Earth -----------------------------
 		google.load("earth", "1");
 		
 		function initCallback(instance) {
 		    ge = instance;
+		    ge_options = ge.getOptions();
+			ge_navigation = ge.getNavigationControl();
 		    ge.getWindow().setVisibility(true);
 	
 		    // add some layers
@@ -207,42 +206,90 @@ var GEGrids = (function() {
 		    ge.getLayerRoot().enableLayerById(ge.LAYER_TERRAIN, true);
 		    ge.getLayerRoot().enableLayerById(ge.LAYER_TREES, true);
 		    ge.getOptions().setStatusBarVisibility(true);
-	
+		    
 		    document.getElementById('installed-plugin-version').innerHTML = ge.getPluginVersion().toString();
 		}
-	
+		
 		function failureCallback(errorCode) {
 		    document.getElementById('map3d').innerHTM = errorCode;
 		}
 		
-		function init() {
-		    google.earth.createInstance('map3d', initCallback, failureCallback);
+		// END: Initialize Google Earth ---------------------------------
+		
+		function setOptions() {
+			
+			ge_options.setStatusBarVisibility(user_options.status_bar);
+			ge_options.setGridVisibility(user_options.lat_lng_grid);
+			ge_options.setOverviewMapVisibility(user_options.overview_map);
+			ge_options.setScaleLegendVisibility(user_options.scale_legend);
+			
+			if (user_options.nav_control) {
+				ge_navigation.setVisibility(ge.VISIBILITY_SHOW);
+            } else {
+            	ge_navigation.setVisibility(ge.VISIBILITY_HIDE);
+            }
 		}
 		
-		document.addEventListener('DOMContentLoaded', function () {
-		    google.setOnLoadCallback(init);
-		});
-		
 		return {
+			init : function() {
+				google.earth.createInstance('map3d', initCallback, failureCallback);
+			},
 			updateOptions : function() {
+				
+				var user_options = controls.getOptions();
+				
+				setOptions(user_options);
+				
+				controls.setNodata();
+			},
+			makeGrid : function() {
 				
 			}
 		};
-//		 B) Google Earth Closure
-//
-//		    1) Data
-//		      a) Grid Object
-//		        1. ID String
-//		          a. color String
-//		          b. value Int
-//
-//		    2) Interface
-//			  a) updateOptions Function
-//		      a) makeGrid Function
-//		      b) clearGrid Function
-//		      c) changeValue(ID) Function
-//		      d) downloadKML Function
 		
+// B) Google Earth Closure
+//
+// 1) Data
+// a) Grid Object
+// 1. ID String
+// a. color String
+// b. value Int
+//
+// 2) Interface
+// a) updateOptions Function
+// a) makeGrid Function
+// b) clearGrid Function
+// c) changeValue(ID) Function
+// d) downloadKML Function
+		
+	}());
+	
+	/*
+	 * GUI & Event Listeners
+	 * 
+	 */
+	(function(){
+		var i = 0,
+		    upOpts = document.getElementsByClassName('updateOptions'),
+		    newOpts = controls.getOptions();
+
+		document.addEventListener('DOMContentLoaded', function () {
+		    google.setOnLoadCallback(googleEarth.init);
+		});
+		
+	    for (i = 0; i <  upOpts.length; i++) {
+	    	upOpts[i].addEventListener('click', function (e) {
+	        	var newOpts = {
+	        	    status_bar : document.getElementById('statusbar').checked,
+	        	    nav_control : document.getElementById('nav').checked,
+	        	    lat_lng_grid : document.getElementById('LL').checked,
+	        	    overview_map : document.getElementById('overview').checked,
+	        	    scale_legend : document.getElementById('scaleLegend').checked,
+	        	    guide_grids : document.getElementById('guideGrid').checked
+	        	};
+		        googleEarth.updateOptions(newOpts);
+	        });
+	    }
 	}());
 	
 }());
