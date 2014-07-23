@@ -143,7 +143,11 @@ var GEGrids = (function() {
 		
 		var options = {},
 			grid_params = {},
-			nodata = {};		
+			nodata = {};
+		
+		function initOptions() {
+			
+		};
 		
 	        return {		
 				setOptions : function(opts) {
@@ -188,8 +192,7 @@ var GEGrids = (function() {
 	 */
 	googleEarth = (function() {
 		
-		var ge, ge_options, ge_navigation,
-			grid = {};
+		var ge, ge_options, ge_navigation, grid = {};
 		
 		// START: Initialize Google Earth -----------------------------
 		google.load("earth", "1");
@@ -216,8 +219,10 @@ var GEGrids = (function() {
 		
 		// END: Initialize Google Earth ---------------------------------
 		
-		function setOptions() {
+		function setOptions(user_options) {
 			
+			console.log(user_options);
+
 			ge_options.setStatusBarVisibility(user_options.status_bar);
 			ge_options.setGridVisibility(user_options.lat_lng_grid);
 			ge_options.setOverviewMapVisibility(user_options.overview_map);
@@ -230,21 +235,27 @@ var GEGrids = (function() {
             }
 		}
 		
+		function fireEvent(event, callback) {
+			google.earth.addEventListener(ge.getGlobe(), event, callback);
+		}
+		
 		return {
 			init : function() {
 				google.earth.createInstance('map3d', initCallback, failureCallback);
+				console.log(ge);
 			},
-			updateOptions : function() {
+			updateOptions : function(user_options) {
 				
-				var user_options = controls.getOptions();
-				
+				//user_options = controls.getOptions();
+				console.log(user_options);
 				setOptions(user_options);
 				
-				controls.setNodata();
+				//controls.setNodata();
 			},
-			makeGrid : function() {
-				
-			}
+//			makeGrid : function() {
+//				
+//			},
+			addEventListener : fireEvent
 		};
 		
 // B) Google Earth Closure
@@ -268,28 +279,40 @@ var GEGrids = (function() {
 	 * GUI & Event Listeners
 	 * 
 	 */
-	(function(){
+	document.addEventListener('DOMContentLoaded', function () {
 		var i = 0,
 		    upOpts = document.getElementsByClassName('updateOptions'),
 		    newOpts = controls.getOptions();
 
-		document.addEventListener('DOMContentLoaded', function () {
-		    google.setOnLoadCallback(googleEarth.init);
-		});
 		
-	    for (i = 0; i <  upOpts.length; i++) {
-	    	upOpts[i].addEventListener('click', function (e) {
-	        	var newOpts = {
-	        	    status_bar : document.getElementById('statusbar').checked,
-	        	    nav_control : document.getElementById('nav').checked,
-	        	    lat_lng_grid : document.getElementById('LL').checked,
-	        	    overview_map : document.getElementById('overview').checked,
-	        	    scale_legend : document.getElementById('scaleLegend').checked,
-	        	    guide_grids : document.getElementById('guideGrid').checked
-	        	};
-		        googleEarth.updateOptions(newOpts);
-	        });
-	    }
-	}());
+			google.setOnLoadCallback(googleEarth.init);
+		
+			
+			googleEarth.addEventListener('mousemove', function (event) {
+		        
+		    	document.getElementById('latPos').innerHTML = event.getLatitude();
+		        document.getElementById('lngPos').innerHTML = event.getLongitude();
+		        
+//		        if (mbutton && event.getTarget().getType() == 'KmlPlacemark' && event.getTarget().getGeometry().getType() == 'KmlPolygon') {
+//		            event.preventDefault();
+//		            dataset.boxColorChange(event.getLatitude(), event.getLongitude());
+//		        }
+		    });
+			
+			for (i = 0; i <  upOpts.length; i++) {
+		    	upOpts[i].addEventListener('click', function (e) {
+			        googleEarth.updateOptions({
+					    status_bar : document.getElementById('statusbar').checked,
+					    nav_control : document.getElementById('nav').checked,
+					    lat_lng_grid : document.getElementById('LL').checked,
+					    overview_map : document.getElementById('overview').checked,
+					    scale_legend : document.getElementById('scaleLegend').checked,
+					    guide_grids : document.getElementById('guideGrid').checked
+					});
+		        });
+		    }
+		    
+		});
+
 	
 }());
