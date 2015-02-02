@@ -1,28 +1,16 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
-<!-- Copyright info: 
-
+<!-- 
 Andrew Stanish 
-2014
+2015
 andybp85 at gmail
-Version 2.0.3.1
+Version 2.0.3.1FF
 Source maintained at https://github.com/andybp85/GERasterCreator/
 
 This file is part of GE Raster Creator. 
 
-GE Raster Creator is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-GE Raster Creator is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with GE Raster Creator.  If not, see <http://www.gnu.org/licenses/>.
-
+This program conforms to and and is covered by the Google Earth TOS: 
+http://earth.google.com/intl/en-US/license.html
 -->
 <head>
 
@@ -51,7 +39,7 @@ along with GE Raster Creator.  If not, see <http://www.gnu.org/licenses/>.
       #output {
           left: 10px;
           position: absolute;
-          top: 850px;
+          top: 860px;
       }
       #download {
           left: 480px;
@@ -132,7 +120,7 @@ along with GE Raster Creator.  If not, see <http://www.gnu.org/licenses/>.
       on/off: <input type="checkbox" class="updateOptions" id="nodata-box" />
       
       <br /><br />
-      Polygon Alt: <input type="text" id="startAlt" value="0"/>
+      Polygon Alt: <input type="hidden" id="startAlt" value="0"/>
       
       <br /><br />
       # Lat Boxes: <input type="text" id="numLat" value="50" /><br />
@@ -146,10 +134,10 @@ along with GE Raster Creator.  If not, see <http://www.gnu.org/licenses/>.
       ASCII File Upload: <br />
       <input type="file" id="files" name="files[]" multiple />
 		  <output id="list"></output>
-	   <br /><br />
-	   KML File Upload: <br />
+	   <!-- <br /><br />
+      KML File Upload: <br />
       <input type="file" id="kml_files" name="files[]" multiple />
-          <output id="kml_list"></output>
+      <output id="kml_list"></output> -->
     </div>
     
   </div>
@@ -158,16 +146,19 @@ along with GE Raster Creator.  If not, see <http://www.gnu.org/licenses/>.
   
   <div id="vers">
     Installed Plugin Version: <span id="installed-plugin-version" style=
-    "font-weight: bold;">Loading...</span>
+    "font-weight: bold;">Loading...</span><br />
+  <a href="http://earth.google.com/intl/en-US/license.html">Google Earth Terms of Service</a>
   </div>
-  <input type="button" id="downloadKML" value="Download kml" /><input type="button" id="download" value="Download ASCII raster" /><label for="filename">filename: </label><input type="text" id="filename" value="dataset" />
-  <br />
+  <input type="button" id="downloadKML" value="Download kml" />
+  <input type="button" id="download" value="Download ASCII raster" />
+  <label for="filename">filename: </label><input type="text" id="filename" value="dataset" />
+    <br />
   
-  <textarea rows="50" cols="150" id="output"></textarea>
+  <textarea rows="50" cols="150" id="output"></textarea><br />
   
-  <!--<script type="text/javascript" src="https://www.google.com/jsapi"></script>-->
-  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBPc2LMkp85McUdaaCUXFfZqmEjPZSepUo"></script>
-  <script type="text/javascript" src="createRaster-maps.js"></script>
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+ <!-- <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBPc2LMkp85McUdaaCUXFfZqmEjPZSepUo"></script>-->
+  <script type="text/javascript" src="createRaster-old.js"></script>
 </body>
 </html>
 

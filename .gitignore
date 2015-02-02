@@ -1,3 +1,6 @@
 .project
 .settings/
 report/
+*.swp
+createRaster-maps.js
+createRaster.js
