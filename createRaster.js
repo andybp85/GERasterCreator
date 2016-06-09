@@ -1,12 +1,12 @@
-/* Copyright info: 
+/* Copyright info:
 
-Andrew Stanish 
+Andrew Stanish
 2014
 andybp85 at gmail
 Version beta2.0.3.1
 Source maintained at https://github.com/andybp85/GERasterCreator/
 
-This file is part of GE Raster Creator. 
+This file is part of GE Raster Creator.
 
 GE Raster Creator is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ along with GE Raster Creator.  If not, see <http://www.gnu.org/licenses/>.
 
 I) Utility Methods
   A) add method
-  B) fire event 
+  B) fire event
 
 II) GEGrids Object
 
@@ -88,7 +88,7 @@ II) GEGrids Object
       b) makeASCII Function
       c) downloadASCII Function
       d) uploadASCII Function
-     
+
   D) Event Triggers
     Delegation
  */
@@ -101,7 +101,7 @@ Object.prototype.method = function (name, func) {
     this.prototype[name] = func;
     return this;
 };
- 
+
 HTMLElement.method('fire', function(evt) {
 	"use strict";
 	var fireOnThis = this, evObj;
@@ -140,124 +140,124 @@ var GEGrids = (function() {
 	 * handles updating the position display.
 	 */
 	var controls = (function() {
-		
+
 		var options = {},
 			grid_params = {},
 			nodata = {};
-		
+
 		function initOptions() {
-			
+
 		};
-		
-	        return {		
-				setOptions : function(opts) {
-					options = opts;
-				},
-				getOptions : function() {
-				    return options;	
-				},
-				setGridParams : function() {
-					grid_params.UR_lat = Number(document.getElementById('startURLat').value);
-					grid_params.UR_lng = Number(document.getElementById('startURLng').value);
-					grid_params.cell_size = Number(document.getElementById('cellSize').value);
-					grid_params.altitude = Number(document.getElementById('startAlt').value);
-					grid_params.num_lat_cells = Number(document.getElementById('numLat').value);
-					grid_params.num_lng_cells = Number(document.getElementById('numLng').value);
-				},
-				getGridParams : function() {
-					return grid_params;
-				},
-				setNodata : function() {
-		        	nodata.checked = document.getElementById('nodata-box').checked;
-		            nodata.value = Number(document.getElementById('nodata').value);
-		        },
-				nodataChecked : function() {
-					return nodata.checked;
-				},
-				nodataValue : function() {
-					return nodata.value;
-				},
-		        updatePosition : function(lat, lng) {
-					document.getElementById('latPos').innerHTML = lat;
-					document.getElementById('lngPos').innerHTML = lng;
-				}
-	        };
+
+        return {
+            setOptions : function(opts) {
+                options = opts;
+            },
+            getOptions : function() {
+                return options;
+            },
+            setGridParams : function() {
+                grid_params.UR_lat = Number(document.getElementById('startURLat').value);
+                grid_params.UR_lng = Number(document.getElementById('startURLng').value);
+                grid_params.cell_size = Number(document.getElementById('cellSize').value);
+                grid_params.altitude = Number(document.getElementById('startAlt').value);
+                grid_params.num_lat_cells = Number(document.getElementById('numLat').value);
+                grid_params.num_lng_cells = Number(document.getElementById('numLng').value);
+            },
+            getGridParams : function() {
+                return grid_params;
+            },
+            setNodata : function() {
+                nodata.checked = document.getElementById('nodata-box').checked;
+                nodata.value = Number(document.getElementById('nodata').value);
+            },
+            nodataChecked : function() {
+                return nodata.checked;
+            },
+            nodataValue : function() {
+                return nodata.value;
+            },
+            updatePosition : function(lat, lng) {
+                document.getElementById('latPos').innerHTML = lat;
+                document.getElementById('lngPos').innerHTML = lng;
+            }
+        };
 
 	}()),
-	
+
 	/*
 	 * googleEarth Closure Initializes Google Earth and provides an easier
 	 * interface for the rest of the program to interact with elements on the
 	 * map.
 	 */
 	googleEarth = (function() {
-		
+
 		var ge, ge_options, ge_navigation, grid = {};
-		
+
 		// START: Initialize Google Earth -----------------------------
 		google.load("earth", "1");
-		
+
 		function initCallback(instance) {
 		    ge = instance;
 		    ge_options = ge.getOptions();
 			ge_navigation = ge.getNavigationControl();
 		    ge.getWindow().setVisibility(true);
-	
+
 		    // add some layers
 		    ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
 		    ge.getLayerRoot().enableLayerById(ge.LAYER_ROADS, true);
 		    ge.getLayerRoot().enableLayerById(ge.LAYER_TERRAIN, true);
 		    ge.getLayerRoot().enableLayerById(ge.LAYER_TREES, true);
 		    ge.getOptions().setStatusBarVisibility(true);
-		    
+
 		    document.getElementById('installed-plugin-version').innerHTML = ge.getPluginVersion().toString();
 		}
-		
+
 		function failureCallback(errorCode) {
 		    document.getElementById('map3d').innerHTM = errorCode;
 		}
-		
+
 		// END: Initialize Google Earth ---------------------------------
-		
+
 		function setOptions(user_options) {
-			
+
 			console.log(user_options);
 
 			ge_options.setStatusBarVisibility(user_options.status_bar);
 			ge_options.setGridVisibility(user_options.lat_lng_grid);
 			ge_options.setOverviewMapVisibility(user_options.overview_map);
 			ge_options.setScaleLegendVisibility(user_options.scale_legend);
-			
+
 			if (user_options.nav_control) {
 				ge_navigation.setVisibility(ge.VISIBILITY_SHOW);
             } else {
             	ge_navigation.setVisibility(ge.VISIBILITY_HIDE);
             }
 		}
-		
+
 		function fireEvent(event, callback) {
 			google.earth.addEventListener(ge.getGlobe(), event, callback);
 		}
-		
+
 		return {
 			init : function() {
 				google.earth.createInstance('map3d', initCallback, failureCallback);
 				console.log(ge);
 			},
 			updateOptions : function(user_options) {
-				
+
 				//user_options = controls.getOptions();
 				console.log(user_options);
 				setOptions(user_options);
-				
+
 				//controls.setNodata();
 			},
 //			makeGrid : function() {
-//				
+//
 //			},
 			addEventListener : fireEvent
 		};
-		
+
 // B) Google Earth Closure
 //
 // 1) Data
@@ -272,33 +272,34 @@ var GEGrids = (function() {
 // b) clearGrid Function
 // c) changeValue(ID) Function
 // d) downloadKML Function
-		
+
 	}());
-	
+
 	/*
 	 * GUI & Event Listeners
-	 * 
+	 *
 	 */
 	document.addEventListener('DOMContentLoaded', function () {
 		var i = 0,
 		    upOpts = document.getElementsByClassName('updateOptions'),
 		    newOpts = controls.getOptions();
 
-		
+
 			google.setOnLoadCallback(googleEarth.init);
-		
-			
+
+
 			googleEarth.addEventListener('mousemove', function (event) {
-		        
+
 		    	document.getElementById('latPos').innerHTML = event.getLatitude();
 		        document.getElementById('lngPos').innerHTML = event.getLongitude();
-		        
+
 //		        if (mbutton && event.getTarget().getType() == 'KmlPlacemark' && event.getTarget().getGeometry().getType() == 'KmlPolygon') {
 //		            event.preventDefault();
 //		            dataset.boxColorChange(event.getLatitude(), event.getLongitude());
 //		        }
 		    });
-			
+
+            // TODO: implement with array.map()
 			for (i = 0; i <  upOpts.length; i++) {
 		    	upOpts[i].addEventListener('click', function (e) {
 			        googleEarth.updateOptions({
@@ -311,8 +312,8 @@ var GEGrids = (function() {
 					});
 		        });
 		    }
-		    
+
 		});
 
-	
+
 }());
