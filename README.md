@@ -24,6 +24,7 @@ Getting Started
 4. run `npm install` from the root directory.
 5. run the dev server: `npm run dev`
 6. run tests with `npm test`
+7. have a look through `package.json` to see what else is going on
 
 
 Structure

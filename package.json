@@ -5,18 +5,19 @@
   "main": "index.html",
   "scripts": {
     "test": "ava \"app/**/*.test.js\" --verbose",
-    "watch:test": "npm run test -- --watch",
+    "w:test": "npm run test -- --watch",
+    "w:cover": "nodemon --quiet --watch app --exec npm run cover -s",
     "dev": "webpack-dev-server --progress --colors --config",
     "cover": "nyc npm run test",
-    "check-coverage": "nyc check-coverage --statements 100 --branches 100 --functions 100 --lines 100"
+    "ch:coverage": "nyc check-coverage --statements 100 --branches 100 --functions 100 --lines 100"
   },
   "nyc": {
     "reporter": [
-        "lcov",
-        "text",
-        "html"
+      "lcov",
+      "text",
+      "html"
     ]
-    },
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/andybp85/GERasterCreator.git"
@@ -32,11 +33,13 @@
     "babel-core": "^6.9.1",
     "babel-eslint": "^6.0.4",
     "babel-loader": "^6.2.4",
+    "babel-register": "^6.9.0",
     "core-js": "^2.4.0",
     "css-loader": "^0.23.1",
     "eslint": "^2.11.1",
     "extract-text-webpack-plugin": "^1.0.1",
     "node-sass": "^3.7.0",
+    "nodemon": "^1.9.2",
     "nyc": "^6.4.4",
     "sass-loader": "^3.2.0",
     "webpack": "^1.13.1",
