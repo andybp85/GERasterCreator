@@ -17,7 +17,12 @@ This rewrite implents ES2015 (w/ Babel), Webpack, Sass, and Ava for testing.
 Getting Started
 ---------------
 
-clone and run `npm install` from the root directory.
+1. clone: `git clone https://github.com/andybp85/GERasterCreator.git`
+2. pull maps branch: `git pull origin maps`
+3. checkout branch: `git checkout maps`
+4. run `npm install` from the root directory.
+5. run the dev server: `npm run dev`
+6. run tests with `npm test`
 
 
 Structure
@@ -32,7 +37,8 @@ This I think is basically the original code base with maps basically dropped in 
 #### gegrids/
 This is the current rewrite
 
-
+Old Comments
+---------
 ```
 I) Utility Methods
   A) add method
