@@ -10,7 +10,7 @@ module.exports = {
         extensions: ["", ".js", ".scss"],
     },
     entry: {
-        app: ["./scripts/app.js", "./stylesheets/app.scss"],
+        app: ["./app.js", "./stylesheets/app.scss"],
     },
     devtool: "source-map",
     output: {
@@ -38,7 +38,7 @@ module.exports = {
           },
           {
             test: /\.scss$/,
-            loader: ExtractTextPlugin.extract('css-loader?sourceMap!scss-loader?sourceMap=true&sourceMapContents=true')
+            loader: ExtractTextPlugin.extract('css-loader?sourceMap!sass-loader?sourceMap=true&sourceMapContents=true')
 
           }
       ]

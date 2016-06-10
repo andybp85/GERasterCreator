@@ -20,9 +20,12 @@
   "devDependencies": {
     "ava": "^0.15.2",
     "babel-core": "^6.9.1",
+    "babel-eslint": "^6.0.4",
     "babel-loader": "^6.2.4",
     "core-js": "^2.4.0",
     "css-loader": "^0.23.1",
+    "eslint": "^2.11.1",
+    "extract-text-webpack-plugin": "^1.0.1",
     "node-sass": "^3.7.0",
     "sass-loader": "^3.2.0",
     "webpack": "^1.13.1",

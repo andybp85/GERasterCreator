@@ -2,4 +2,6 @@
 .settings/
 report/
 *.sw*
-node_modules
+inode_modules
+coverage/
+npm-debug.log
