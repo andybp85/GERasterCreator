@@ -9,6 +9,7 @@ This rewrite implents ES2015 (w/ Babel), Webpack, Sass, and Ava for testing.
 
 #### Resources
 * [Ava: Futuristic test runner](https://github.com/avajs/ava)
+* [React Ava Workshop](https://github.com/kentcdodds/react-ava-workshop/blob/master/INSTRUCTIONS.md)
 * [Webpack Module Builder](https://webpack.github.io/docs/usage.html)
 * [Sass Basics](http://sass-lang.com/guide)
 * [Tutorial – write in ES6 and Sass on the front end with Webpack and Babel](http://tech.90min.com/?p=1340)
