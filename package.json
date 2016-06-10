@@ -1,0 +1,19 @@
+{
+  "name": "gerastercreate",
+  "version": "1.0.0",
+  "description": "This is the first free, customizable creator of raster data from Google Earth.",
+  "main": "index.html",
+  "scripts": {
+    "test": "test -- --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andybp85/GERasterCreator.git"
+  },
+  "author": "Andrew Stanish",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/andybp85/GERasterCreator/issues"
+  },
+  "homepage": "https://github.com/andybp85/GERasterCreator#readme"
+}

@@ -1,12 +1,12 @@
-/* Copyright info: 
+/* Copyright info:
 
-Andrew Stanish 
+Andrew Stanish
 2014
 andybp85 at gmail
 Version 2.0.3.1
 Source maintained at https://github.com/andybp85/GERasterCreator/
 
-This file is part of GE Raster Creator. 
+This file is part of GE Raster Creator.
 
 GE Raster Creator is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -208,16 +208,16 @@ var filesys = {
                         }
                         i++;
                     }
-                    
+
                     //get ready to parse
                     var head = i + 1,
-                        row = 0,    
+                        row = 0,
                         col = 0,
                         ids = new Array();
-                    
+
                     //draw a blank map
                     fireEvent(document.getElementById('drawMap'), 'click');
-                    
+
                     //map out ids
                     while (row < numLat) {
                         col = 0;
@@ -226,37 +226,37 @@ var filesys = {
                             col++;
                         }
                         row++;
-                    }                    
-                    
-                    // parse raster, click on cells 
+                    }
+
+                    // parse raster, click on cells
                     mbutton = true;
-                    
+
                     for (var i = 0; i < ids.length; i++){
-                        
+
                         var boxOuterGeom = ge.getElementById(ids[i].toString()).getGeometry().getOuterBoundary().getCoordinates();
                         var boxInnerGeom = ge.getElementById(ids[i].toString()).getGeometry().getInnerBoundaries().getFirstChild().getCoordinates();
-                        
+
                         var insideBox = {
                         		lat: (boxOuterGeom.get(0).getLatitude() + boxInnerGeom.get(0).getLatitude()) / 2,
                         		lng: (boxOuterGeom.get(0).getLongitude() + boxInnerGeom.get(0).getLongitude()) / 2
                         };
 
                         if ( raster[head+i] == 1 ) {
-                            
+
                             elem = dataset.getBox(insideBox.lat, insideBox.lng );
                             dataset.bCC(elem.latI, elem.lngI, ids[i].toString(), true );
 
                         } else if ( raster[head+i] == -999 ){
-                        	
+
                         	noData.checked = true;
                         	elem = dataset.getBox(insideBox.lat, insideBox.lng );
                             dataset.bCC(elem.latI, elem.lngI, ids[i].toString(), true );
                             noData.checked = false;
-                            
+
                         }
                     }
                     mbutton = false;
-                    
+
                     dataset.render();
                     alert('File Loaded');
                 };
@@ -270,7 +270,7 @@ var filesys = {
         var files = evt.target.files; // FileList object
 
         for (var i = 0, f; f = files[i]; i++) {
-        	
+
         	var reader = new FileReader();
 
             // Closure to capture the file information.
@@ -279,9 +279,9 @@ var filesys = {
                 	console.log( theFile );
                     filesys.upfile = e.target.result;
                     var kmlObject = ge.parseKml(filesys.upfile);
-                    
+
                     ge.getFeatures().appendChild(kmlObject);
-                    
+
                     alert('File Loaded');
                 };
 
@@ -289,7 +289,7 @@ var filesys = {
 
             // Read in the file as a string.
             reader.readAsText(f);
-	  		
+
         }
     }
 
@@ -331,7 +331,7 @@ var filesys = {
 //		  }, filesys.errorHandler);
 //
 //		}, this.errorHandler);
-//		
+//
 
 
 //		window.requestFileSystem(window.TEMPORARY, 1024*1024, onInitFs, this.errorHandler);
@@ -387,27 +387,27 @@ var filesys = {
 //	onInitFs : function(filesys) {
 //		console.log( filesys );
 //	  filesys.root.getFile(this.name, {create: true}, function(fileEntry) {
-//	
+//
 //		// Create a FileWriter object for our FileEntry (log.txt).
 //		fileEntry.createWriter(function(fileWriter) {
-//	
+//
 //		  fileWriter.onwriteend = function(e) {
 //			console.log('Write completed.');
 //		  };
-//	
+//
 //		  fileWriter.onerror = function(e) {
 //			console.log('Write failed: ' + e.toString());
 //		  };
-//	
+//
 //		  // Create a new Blob and write it to log.txt.
 //		  var blob = new Blob(['Lorem Ipsum'], {type: 'text/plain'});
-//	
+//
 //		  fileWriter.write(blob);
-//	
+//
 //		}, this.errorHandler);
-//	
+//
 //	  }, this.errorHandler);
-//	
+//
 //	}
 
 
@@ -454,9 +454,9 @@ var dataset = {
     },
 
     getBox: function (lat, lng) {
-		
+
         var latI = 0;
-		
+
         while (lat < this.rasterMap.LRlatVals[latI]) {
             latI++;
         }
@@ -480,15 +480,15 @@ var dataset = {
             var LL = dataset.getBox(lat, lng);
 
             var id = ( (Number(LL.lngI) * numLat ) + Number(LL.latI) ).toString() ;
-			
+
             this.bCC(LL.latI, LL.lngI, id);
         }
     },
     bCC : function(latI, lngI, id, fastMode) {
-    	
+
         var placemarkStyle = ge.getElementById(id).getStyleSelector();
         if (this.oldID != id || fastMode) {
-            
+
             if (noData.checked) {
                 this.grid[latI][lngI] = noData.val;
                 placemarkStyle.getLineStyle().getColor().set('ffae33ff');
@@ -502,7 +502,7 @@ var dataset = {
                 placemarkStyle.getLineStyle().getColor().set('ff00008b');
                 placemarkStyle.getPolyStyle().getColor().set('ff00008b');
             }
-            
+
             if (! fastMode) this.render();
 
             this.oldID = parseInt(id);
@@ -694,7 +694,7 @@ function drawInnerLines(folder) {
 }
 
 function addLine(lat1, lng1, lat2, lng2, alt, folder) {
-    
+
     // Create the placemark
     var lineStringPlacemark = ge.createPlacemark('');
 
@@ -799,5 +799,5 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     document.getElementById('files').addEventListener('change', filesys.uploadRaster, false);
     document.getElementById('kml_files').addEventListener('change', filesys.uploadKML, false);
-    
+
 });
