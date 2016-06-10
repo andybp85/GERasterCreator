@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<!--
+Andrew Stanish
+2014
+andybp85 at gmail
+Version 2.0.3.1
+Source maintained at https://github.com/andybp85/GERasterCreator/
+
+This file is part of GE Raster Creator.
+
+GE Raster Creator is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+GE Raster Creator is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GE Raster Creator.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<head>
+    <title>Create Raster Dataset</title>
+</head>
+
+<body>
+    <div id="map3d">
+    </div>
+
+
+    <div id="controls">
+        <div id="options">
+            Options:<br>
+            <input checked="checked" class="updateOptions" id="statusbar" type=
+            "checkbox">Status Bar<br>
+            <input class="updateOptions" id="nav" type="checkbox">Navigation
+            Control<br>
+            <input class="updateOptions" id="LL" type="checkbox">Lat/Long<br>
+            <input class="updateOptions" id="overview" type="checkbox">Overview
+            Map<br>
+            <input class="updateOptions" id="scaleLegend" type="checkbox">Scale
+            Legend<br>
+            <input id="guideGrid" type="checkbox">Guide Grids<br>
+            <!--Guide Size: <br />
+      <select id="guideGridSize" >
+        <option value="2">1/2</option>
+        <option value="3" selected>1/3</option>
+        <option value="5">1/5</option>
+        <option value="10">1/10</option>
+      </select> -->
+        </div>
+        <br>
+
+
+        <div id="position">
+        </div>
+        Position:<br>
+        Lat:
+
+        <div class="position" id="latPos">
+            0
+        </div>
+        Lng:
+
+        <div class="position" id="lngPos">
+            0
+        </div>
+    </div>
+    <br>
+
+
+    <div id="parameters">
+        First Box:<br>
+        UR Lat: <input id="startURLat" type="text" value="-8.07"><br>
+        UR Long: <input id="startURLng" type="text" value="33.226"><br>
+        <br>
+        Cell Size: <input id="cellSize" type="text" value="0.01"><br>
+        <br>
+        Nodata Val: <input id="nodata" type="text" value="-999"><br>
+        on/off: <input class="updateOptions" id="nodata-box" type=
+        "checkbox"><br>
+        <br>
+        Polygon Alt: <input id="startAlt" type="text" value="0"><br>
+        <br>
+        # Lat Boxes: <input id="numLat" type="text" value="50"><br>
+        # Long Boxes: <input id="numLng" type="text" value="50"><br>
+        <input id="drawMap" type="button" value="Draw"><br>
+        <br>
+        Note: All units in decimal.<br>
+        <br>
+        ASCII File Upload:<br>
+        <input id="files" multiple name="files[]" type="file"> <output id=
+        "list"></output><br>
+        <br>
+        KML File Upload:<br>
+        <input id="kml_files" multiple name="files[]" type="file"> <output id=
+        "kml_list"></output>
+    </div>
+    <br>
+
+
+    <div id="vers">
+        Installed Plugin Version: <span id="installed-plugin-version" style=
+        "font-weight: bold;">Loading...</span>
+    </div>
+
+
+    <form>
+        <input id="downloadKML" type="button" value="Download kml"><input id=
+        "download" type="button" value="Download ASCII raster"><label for=
+        "filename">filename:</label> <input id="filename" type="text" value=
+        "dataset"><br>
+
+        <textarea cols="150" id="output" rows="50"></textarea>
+        <!--<script type="text/javascript" src="https://www.google.com/jsapi"></script>-->
+
+        <script src=
+        "https://maps.googleapis.com/maps/api/js?key=AIzaSyBPc2LMkp85McUdaaCUXFfZqmEjPZSepUo"
+        type="text/javascript">
+        </script>
+        <script src="bundle.js" type="text/javascript">
+        </script>
+    </form>
+</body>
+</html>

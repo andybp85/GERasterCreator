@@ -1,10 +1,11 @@
 {
-  "name": "gerastercreate",
+  "name": "gegrids",
   "version": "1.0.0",
   "description": "This is the first free, customizable creator of raster data from Google Earth.",
   "main": "index.html",
   "scripts": {
-    "test": "test -- --watch"
+    "test": "ava --watch",
+    "dev": "webpack-dev-server --progress --colors --config"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,16 @@
   "bugs": {
     "url": "https://github.com/andybp85/GERasterCreator/issues"
   },
-  "homepage": "https://github.com/andybp85/GERasterCreator#readme"
+  "homepage": "https://github.com/andybp85/GERasterCreator#readme",
+  "devDependencies": {
+    "ava": "^0.15.2",
+    "babel-core": "^6.9.1",
+    "babel-loader": "^6.2.4",
+    "core-js": "^2.4.0",
+    "css-loader": "^0.23.1",
+    "node-sass": "^3.7.0",
+    "sass-loader": "^3.2.0",
+    "webpack": "^1.13.1",
+    "webpack-dev-server": "^1.14.1"
+  }
 }
