@@ -32,8 +32,8 @@ module.exports = {
             exclude: /(node_modules)/,
             loader: 'babel-loader',
             query: {
-              optional: 'runtime',
-              nonStandard: 'false',
+              presets: ['es2015'],
+              plugins: ['transform-runtime']
             },
           },
           {

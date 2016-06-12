@@ -50,7 +50,7 @@ class Maps {
 
     return {
         init : function() {
-            
+
             console.log(ge);
         },
         updateOptions : function(user_options) {

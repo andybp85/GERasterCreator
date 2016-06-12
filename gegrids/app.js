@@ -1,5 +1,5 @@
-import controls from 'modules/controls';
-import maps from 'modules/maps';
+import controls from './modules/controls';
+import maps from './modules/maps';
 
 // UTILITY METHODS ----------------------------------
 Object.prototype.method = function (name, func) {
