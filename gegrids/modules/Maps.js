@@ -22,6 +22,8 @@ class Maps {
         ge.getOptions().setStatusBarVisibility(true);
 
         document.getElementById('installed-plugin-version').innerHTML = ge.getPluginVersion().toString();
+
+        console.log(ge);
     }
 
     failureCallback(errorCode) {
@@ -44,29 +46,15 @@ class Maps {
         }
     }
 
-    fireEvent(event, callback) {
-        google.maps.addEventListener(ge.getGlobe(), event, callback);
-    }
+    updateOptions(user_options) {
 
-    return {
-        init : function() {
-
-            console.log(ge);
-        },
-        updateOptions : function(user_options) {
-
-            //user_options = controls.getOptions();
-            console.log(user_options);
+        console.log(user_options);
             setOptions(user_options);
 
-            //controls.setNodata();
-        },
-//			makeGrid : function() {
-//
-//			},
-        addEventListener : fireEvent
-    };
 
+    }
+
+};
 // B) Google Earth Closure
 //
 // 1) Data
@@ -82,4 +70,3 @@ class Maps {
 // c) changeValue(ID) Function
 // d) downloadKML Function
 
-	}());
