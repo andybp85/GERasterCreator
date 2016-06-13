@@ -1,3 +1,8 @@
+/**
+ * Maps.js
+ * flow
+ */
+
 /*
 * maps module wraps Google Earth and provides an easier
 * interface for the rest of the program to interact with elements on the
@@ -49,7 +54,7 @@ class Maps {
     updateOptions(user_options) {
 
         console.log(user_options);
-            setOptions(user_options);
+            this.setOptions(user_options);
 
 
     }

@@ -1,30 +1,28 @@
-import controls from './modules/controls';
-import maps from './modules/maps';
+/* @flow */
 
-// UTILITY METHODS ----------------------------------
-Object.prototype.method = function (name, func) {
-	"use strict";
-    this.prototype[name] = func;
-    return this;
-};
+// import controls from './modules/controls';
+// import maps from './modules/maps';
 
-HTMLElement.method('fire', function(evt) {
-	"use strict";
-	var fireOnThis = this, evObj;
-	if (document.createEvent) {
-		evObj = document.createEvent('MouseEvents');
-		evObj.initEvent(evt, true, false);
-		fireOnThis.dispatchEvent(evObj);
-	} else if (document.createEventObject) { // IE
-		evObj = document.createEventObject();
-		fireOnThis.fireEvent('on' + evt, evObj);
-	}
-});
+// // UTILITY METHODS ----------------------------------
+// Object.prototype.method = function (name, func) {
+    // this.prototype[name] = func;
+    // return this;
+// };
+
+// HTMLElement.method('fire', function(evt) {
+	// if (document.createEvent) {
+		// evObj = document.createEvent('MouseEvents');
+		// evObj.initEvent(evt, true, false);
+		// fireOnThis.dispatchEvent(evObj);
+	// } else if (document.createEventObject) { // IE
+		// evObj = document.createEventObject();
+		// fireOnThis.fireEvent('on' + evt, evObj);
+	// }
+// });
 
 
 // GEGrids Namespace ----------------------------------
-var GEGrids = (function() {
-	"use strict";
+const GEGrids = (function() {
 
 	/*
 	 * GUI & Event Listeners

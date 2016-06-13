@@ -26,6 +26,7 @@ along with GE Raster Creator.  If not, see <http://www.gnu.org/licenses/>.
 
 <head>
     <title>Create Raster Dataset</title>
+    <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
@@ -47,61 +48,61 @@ along with GE Raster Creator.  If not, see <http://www.gnu.org/licenses/>.
             Legend<br>
             <input id="guideGrid" type="checkbox">Guide Grids<br>
             <!--Guide Size: <br />
-      <select id="guideGridSize" >
-        <option value="2">1/2</option>
-        <option value="3" selected>1/3</option>
-        <option value="5">1/5</option>
-        <option value="10">1/10</option>
-      </select> -->
+            <select id="guideGridSize" >
+                <option value="2">1/2</option>
+                <option value="3" selected>1/3</option>
+                <option value="5">1/5</option>
+                <option value="10">1/10</option>
+            </select> -->
+            <br>
+
+
+            <div id="position">
+            </div>
+            Position:<br>
+            Lat:
+
+            <div class="position" id="latPos">
+                0
+            </div>
+            Lng:
+
+            <div class="position" id="lngPos">
+                0
+            </div>
         </div>
         <br>
 
 
-        <div id="position">
+        <div id="parameters">
+            First Box:<br>
+            UR Lat: <input id="startURLat" type="text" value="-8.07"><br>
+            UR Long: <input id="startURLng" type="text" value="33.226"><br>
+            <br>
+            Cell Size: <input id="cellSize" type="text" value="0.01"><br>
+            <br>
+            Nodata Val: <input id="nodata" type="text" value="-999"><br>
+            on/off: <input class="updateOptions" id="nodata-box" type=
+            "checkbox"><br>
+            <br>
+            Polygon Alt: <input id="startAlt" type="text" value="0"><br>
+            <br>
+            # Lat Boxes: <input id="numLat" type="text" value="50"><br>
+            # Long Boxes: <input id="numLng" type="text" value="50"><br>
+            <input id="drawMap" type="button" value="Draw"><br>
+            <br>
+            Note: All units in decimal.<br>
+            <br>
+            ASCII File Upload:<br>
+            <input id="files" multiple name="files[]" type="file"> <output id=
+            "list"></output><br>
+            <br>
+            KML File Upload:<br>
+            <input id="kml_files" multiple name="files[]" type="file"> <output id=
+            "kml_list"></output>
         </div>
-        Position:<br>
-        Lat:
-
-        <div class="position" id="latPos">
-            0
-        </div>
-        Lng:
-
-        <div class="position" id="lngPos">
-            0
-        </div>
+        <br>
     </div>
-    <br>
-
-
-    <div id="parameters">
-        First Box:<br>
-        UR Lat: <input id="startURLat" type="text" value="-8.07"><br>
-        UR Long: <input id="startURLng" type="text" value="33.226"><br>
-        <br>
-        Cell Size: <input id="cellSize" type="text" value="0.01"><br>
-        <br>
-        Nodata Val: <input id="nodata" type="text" value="-999"><br>
-        on/off: <input class="updateOptions" id="nodata-box" type=
-        "checkbox"><br>
-        <br>
-        Polygon Alt: <input id="startAlt" type="text" value="0"><br>
-        <br>
-        # Lat Boxes: <input id="numLat" type="text" value="50"><br>
-        # Long Boxes: <input id="numLng" type="text" value="50"><br>
-        <input id="drawMap" type="button" value="Draw"><br>
-        <br>
-        Note: All units in decimal.<br>
-        <br>
-        ASCII File Upload:<br>
-        <input id="files" multiple name="files[]" type="file"> <output id=
-        "list"></output><br>
-        <br>
-        KML File Upload:<br>
-        <input id="kml_files" multiple name="files[]" type="file"> <output id=
-        "kml_list"></output>
-    </div>
-    <br>
 
 
     <div id="vers">

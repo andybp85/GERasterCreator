@@ -12,7 +12,7 @@ const controls = {
         options = opts;
     },
     getOptions () {
-        return options;
+        return this.options;
     },
     setGridParams () {
         this.grid_params.UR_lat = Number(document.getElementById('startURLat').value);
