@@ -1,6 +1,7 @@
 var path = require('path');
 var webpack = require('webpack');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+// var config = require('config');
 require('core-js');
 
 module.exports = {
@@ -8,6 +9,9 @@ module.exports = {
     resolve: {
         modulesDirectories: ["node_modules", "scripts", "stylesheets"],
         extensions: ["", ".js", ".scss"],
+        alias: {
+            config: path.join(__dirname, 'config', process.env.NODE_ENV)
+        }
     },
     entry: {
         app: ["./app.js", "./stylesheets/app.scss"],
@@ -43,7 +47,9 @@ module.exports = {
           }
       ]
     },
-    plugins: [ new ExtractTextPlugin('styles.css')]
+    plugins: [
+        new ExtractTextPlugin('styles.css')
+    ]
     // plugins: [ new webpack.HotModuleReplacementPlugin(), new ExtractTextPlugin('styles.css')]
 
 };

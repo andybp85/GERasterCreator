@@ -24,10 +24,11 @@ Getting Started
 2. pull maps branch: `git pull origin maps`
 3. checkout branch: `git checkout maps`
 4. run `npm install` from the root directory.
-5. run the dev server: `npm run dev`
-6. run tests with `npm test`
-7. have a look through `package.json` to see what else is going on
-8. run `flow`
+5. set `NODE_ENV` in your environment and add your google maps api browser key to the apprpriate file in `confg` (see below)
+6. run the dev server: `npm run dev`
+7. run tests with `npm test`
+8. have a look through `package.json` to see what else is going on
+9. run `flow`
 
 
 Structure
