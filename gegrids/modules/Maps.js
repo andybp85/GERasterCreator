@@ -8,23 +8,42 @@
 * interface for the rest of the program to interact with elements on the
 * map.
 */
+import MapLoader from 'gmaps-loader';
+import GEGRIDS_MAPS_API from 'config';
+
 class Maps {
-    constructor(ge) {
 
-        google.load("maps", "1");
+    constructor() {
 
-        google.maps.createInstance('map3d', initCallback, failureCallback);
+        this.loader = new MapLoader({
+            apiKey: GEGRIDS_MAPS_API
+        });
 
-        ge_options = ge.getOptions();
-        ge_navigation = ge.getNavigationControl();
-        ge.getWindow().setVisibility(true);
+        this.loader.load()
+            .then(function(api) {
+            new api.Map(document.querySelector('#map3d'), {
+                center: {
+                lat: -34.397,
+                lng: 150.644
+                },
+                zoom: 8
+            });
+        });
 
-        // add some layers
-        ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
-        ge.getLayerRoot().enableLayerById(ge.LAYER_ROADS, true);
-        ge.getLayerRoot().enableLayerById(ge.LAYER_TERRAIN, true);
-        ge.getLayerRoot().enableLayerById(ge.LAYER_TREES, true);
-        ge.getOptions().setStatusBarVisibility(true);
+        /* google.load("maps", "1"); */
+
+        // google.maps.createInstance('map3d', initCallback, failureCallback);
+
+        // ge_options = ge.getOptions();
+        // ge_navigation = ge.getNavigationControl();
+        // ge.getWindow().setVisibility(true);
+
+        // // add some layers
+        // ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
+        // ge.getLayerRoot().enableLayerById(ge.LAYER_ROADS, true);
+        // ge.getLayerRoot().enableLayerById(ge.LAYER_TERRAIN, true);
+        // ge.getLayerRoot().enableLayerById(ge.LAYER_TREES, true);
+        /* ge.getOptions().setStatusBarVisibility(true); */
 
         document.getElementById('installed-plugin-version').innerHTML = ge.getPluginVersion().toString();
 

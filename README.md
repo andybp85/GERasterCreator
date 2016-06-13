@@ -28,7 +28,7 @@ Getting Started
 6. run the dev server: `npm run dev`
 7. run tests with `npm test`
 8. have a look through `package.json` to see what else is going on
-9. run `flow`
+9. run typechecking with `flow`
 
 
 Structure
@@ -42,6 +42,16 @@ This I think is basically the original code base with maps basically dropped in 
 
 #### gegrids/
 This is the current rewrite
+
+
+Config
+------
+
+Set an env var for the status of the project to 'development' and then put your Google Maps API key in `config/development.js`. You can set the env var just for the dev server command with `NODE_ENV='development' npm run dev`. Config file should look like this:
+```
+export const GEGRIDS_MAPS_API='yourapikey';
+
+```
 
 Old Comments
 ---------
