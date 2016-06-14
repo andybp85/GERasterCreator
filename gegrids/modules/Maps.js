@@ -1,6 +1,6 @@
 /**
  * Maps.js
- * flow
+ * @flow
  */
 
 /*
@@ -14,13 +14,13 @@ import {GEGRIDS_MAPS_API} from 'config';
 
 export default class Maps {
 
-    constructor(mapElem) {
+    constructor(mapElem: HTMLElement) {
 
-        this.loader = new MapLoader({
+        const loader = new MapLoader({
             apiKey: GEGRIDS_MAPS_API
         });
 
-        this.loader.load()
+        loader.load()
             .then(function(api) {
             new api.Map(mapElem, {
                 center: {
@@ -51,9 +51,9 @@ export default class Maps {
         /* console.log(ge); */
     }
 
-    failureCallback(errorCode) {
-        document.getElementById('map3d').innerHTM = errorCode;
-    }
+    // failureCallback(errorCode: String) {
+        // document.getElementById('map3d').innerHTM = errorCode;
+    // }
 
     // setOptions(user_options) {
 

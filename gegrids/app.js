@@ -34,7 +34,7 @@ const GEGrids = (function() {
 		    newOpts = controls.getOptions();
 
 
-            const map = new Maps(document.querySelector('#map3d'));
+            const map = new Maps(document.getElementById('map3d'));
 
 
 			// google.setOnLoadCallback(maps.init);

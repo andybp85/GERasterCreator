@@ -4,12 +4,14 @@
   "description": "This is the first free, customizable creator of raster data from Google Earth.",
   "main": "index.html",
   "scripts": {
-    "test": "ava \"app/**/*.test.js\" --verbose",
-    "w:test": "npm run test -- --watch",
-    "w:cover": "nodemon --quiet --watch app --exec npm run cover -s",
     "dev": "webpack-dev-server --progress --colors --config",
+    "test": "ava \"gegrids/**/*.test.js\" --verbose",
     "cover": "nyc npm run test",
-    "ch:coverage": "nyc check-coverage --statements 100 --branches 100 --functions 100 --lines 100"
+    "chcoverage": "nyc check-coverage --statements 100 --branches 100 --functions 100 --lines 100",
+    "flow": "flow",
+    "wtest": "npm run test -- --watch",
+    "wcover": "nodemon --quiet --watch gegrids --exec npm run cover -s",
+    "wflow": "nodemon --quiet --watch gegrids --exec npm run flow -s"
   },
   "nyc": {
     "reporter": [

@@ -1,3 +1,7 @@
+/**
+ * controls.js
+ * @flow
+ */
 /*
 * Controls Closure Interface for the user to set the option of Google
 * Earth, the parameters of the grid being drawn and the ASCII output, and
