@@ -1,7 +1,7 @@
 /* @flow */
 
 import controls from './modules/controls';
-import maps from './modules/maps';
+import Maps from './modules/Maps';
 
 // // UTILITY METHODS ----------------------------------
 // Object.prototype.method = function (name, func) {
@@ -32,6 +32,9 @@ const GEGrids = (function() {
 		var i = 0,
 		    upOpts = document.getElementsByClassName('updateOptions'),
 		    newOpts = controls.getOptions();
+
+
+            const map = new Maps(document.querySelector('#map3d'));
 
 
 			// google.setOnLoadCallback(maps.init);

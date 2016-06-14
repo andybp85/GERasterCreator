@@ -47,7 +47,7 @@ This is the current rewrite
 Config
 ------
 
-Set an env var for the status of the project to 'development' and then put your Google Maps API key in `config/development.js`. You can set the env var just for the dev server command with `NODE_ENV='development' npm run dev`. Config file should look like this:
+Set an env var for the status of the project to 'development' and then put your Google Maps API Browser key in `config/development.js`. You can set the env var just for the dev server command with `NODE_ENV='development' npm run dev`. Config file should look like this:
 ```
 export const GEGRIDS_MAPS_API='yourapikey';
 

@@ -16,7 +16,7 @@ module.exports = {
     entry: {
         app: ["./app.js", "./stylesheets/app.scss"],
     },
-    devtool: "source-map",
+    devtool: "#inline-source-map",
     output: {
         path: path.join(__dirname, 'dist'),
         publicPath: '/',
