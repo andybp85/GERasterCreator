@@ -5,7 +5,7 @@ Original Aricle, read for description of funtionality:
 
 [A novel approach to mapping land conversion using Google Earth with an application to East Africa](http://www.sciencedirect.com/science/article/pii/S1364815215001747)
 
-This rewrite implents ES2015 (w/ Babel), Webpack, Sass, Ava for testing, and Flow for type checking.
+This rewrite implents Google Maps (as Earth is deprecated and no longer works), ES2015 (w/ Babel), Webpack, Sass, Ava for testing, and Flow for type checking.
 
 #### Resources
 * [Ava: Futuristic test runner](https://github.com/avajs/ava)
@@ -27,8 +27,18 @@ Getting Started
 5. set `NODE_ENV` in your environment and add your google maps api browser key to the apprpriate file in `confg` (see below)
 6. run the dev server: `npm run dev`
 7. run tests with `npm test`
-8. have a look through `package.json` to see what else is going on
+8. check test coverage with `npm run chcoverage` and create coverage report with `npm run cover`
 9. run typechecking with `flow`
+10. have a look through `package.json` to see what else is going on (there's watch versons of previous commands, for starters)
+
+Config
+------
+
+The npm scripts set a `NODE_ENV` environment varable, which is used to pick a config file in `config/`. Currently, they correspond to `config/development.js` and `config/test.js`. For now, both should contain the same info, a Google Maps API Browser key. Config files should look like this:
+```
+export const GEGRIDS_MAPS_API='yourapikey';
+
+```
 
 
 Structure
@@ -42,16 +52,6 @@ This I think is basically the original code base with maps basically dropped in 
 
 #### gegrids/
 This is the current rewrite
-
-
-Config
-------
-
-Set an env var for the status of the project to 'development' and then put your Google Maps API Browser key in `config/development.js`. You can set the env var just for the dev server command with `NODE_ENV='development' npm run dev`. Config file should look like this:
-```
-export const GEGRIDS_MAPS_API='yourapikey';
-
-```
 
 Old Comments
 ---------

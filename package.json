@@ -4,21 +4,31 @@
   "description": "This is the first free, customizable creator of raster data from Google Earth.",
   "main": "index.html",
   "scripts": {
-    "dev": "webpack-dev-server --progress --colors --config",
-    "test": "ava \"gegrids/**/*.test.js\" --verbose",
-    "cover": "nyc npm run test",
-    "chcoverage": "nyc check-coverage --statements 100 --branches 100 --functions 100 --lines 100",
-    "flow": "flow",
-    "wtest": "npm run test -- --watch",
-    "wcover": "nodemon --quiet --watch gegrids --exec npm run cover -s",
-    "wflow": "nodemon --quiet --watch gegrids --exec npm run flow -s"
+    "dev": "NODE_ENV=development webpack-dev-server --progress --colors --config",
+    "test": "NODE_ENV=test ava \"gegrids/**/*.test.js\" --verbose",
+    "cover": "NODE_ENV=test nyc npm run test",
+    "chcoverage": "NODE_ENV=test nyc check-coverage",
+    "flow": "NODE_ENV=development flow",
+    "wtest": "NODE_ENV=test npm run test -- --watch",
+    "wcover": "NODE_ENV=test nodemon --quiet --watch gegrids --exec npm run cover -s",
+    "wflow": "NODE_ENV=development nodemon --quiet --watch gegrids --exec npm run flow -s"
+  },
+  "ava": {
+    "require": [
+      "./test/helpers/setup-test-env.js"
+    ]
   },
   "nyc": {
     "reporter": [
       "lcov",
       "text",
       "html"
-    ]
+    ],
+    "lines": 100,
+    "statements": 100,
+    "branches": 100,
+    "functions": 100,
+    "check-coverage": false
   },
   "repository": {
     "type": "git",
@@ -36,6 +46,8 @@
     "babel-eslint": "^6.0.4",
     "babel-loader": "^6.2.4",
     "babel-plugin-transform-flow-strip-types": "^6.8.0",
+    "babel-plugin-webpack-alias": "^1.3.1",
+    "babel-polyfill": "^6.9.1",
     "babel-preset-es2015": "^6.9.0",
     "babel-register": "^6.9.0",
     "core-js": "^2.4.0",
